@@ -1,0 +1,82 @@
+CREATE OR REPLACE VIEW `your_project.analytics.vw_pacing_master_dashboard` AS
+
+WITH daily_paid_media AS (
+  SELECT 
+    date,
+    channel,
+    SUM(cost) AS cost,
+    SUM(impressions) AS impressions,
+    SUM(clicks) AS clicks
+  FROM `your_project.raw_funnel.paid_media`
+  GROUP BY 1, 2
+),
+
+daily_ga_delivery AS (
+  SELECT 
+    date,
+    channel,
+    SUM(sessions) AS sessions,
+    SUM(ga_transactions) AS ga_transactions,
+    SUM(ga_revenue) AS ga_revenue
+  FROM `your_project.raw_ga4.delivery`
+  GROUP BY 1, 2
+),
+
+daily_shopify_actuals AS (
+  SELECT 
+    date,
+    SUM(shopify_orders) AS total_shopify_orders,
+    SUM(shopify_revenue) AS total_shopify_revenue
+  FROM `your_project.raw_shopify.delivery`
+  GROUP BY 1
+),
+
+-- Combine channel-level marketing delivery
+unified_channel_delivery AS (
+  SELECT 
+    COALESCE(p.date, g.date) AS date,
+    COALESCE(p.channel, g.channel) AS channel,
+    COALESCE(p.cost, 0) AS actual_cost,
+    COALESCE(p.impressions, 0) AS impressions,
+    COALESCE(p.clicks, 0) AS clicks,
+    COALESCE(g.sessions, 0) AS sessions,
+    COALESCE(g.ga_transactions, 0) AS actual_conversions,
+    COALESCE(g.ga_revenue, 0) AS actual_ga_revenue
+  FROM daily_paid_media p
+  FULL OUTER JOIN daily_ga_delivery g
+    ON p.date = g.date 
+   AND p.channel = g.channel
+)
+
+-- Final Join: Unified Marketing + Financial Actuals + Targets
+SELECT 
+  d.date,
+  FORMAT_DATE('%Y-%m-01', d.date) AS month_start,
+  d.channel,
+  d.actual_cost,
+  d.impressions,
+  d.clicks,
+  d.sessions,
+  d.actual_conversions,
+  d.actual_ga_revenue,
+  
+  -- Store-level financial actuals
+  s.total_shopify_orders,
+  s.total_shopify_revenue,
+  
+  -- Targets from Google Sheets
+  COALESCE(t.spend_target, 0) AS spend_target,
+  COALESCE(t.conversions_target, 0) AS conversions_target,
+  COALESCE(t.target_cpa, 0) AS target_cpa,
+  COALESCE(t.revenue_target, 0) AS revenue_target,
+  
+  -- Key Pacing % Performance Calculations
+  SAFE_DIVIDE(d.actual_cost, NULLIF(t.spend_target, 0)) AS spend_pacing_pct,
+  SAFE_DIVIDE(d.actual_conversions, NULLIF(t.conversions_target, 0)) AS conversion_pacing_pct,
+  SAFE_DIVIDE(d.actual_ga_revenue, NULLIF(t.revenue_target, 0)) AS revenue_pacing_pct
+FROM unified_channel_delivery d
+LEFT JOIN daily_shopify_actuals s 
+  ON d.date = s.date
+LEFT JOIN `your_project.google_sheets.marketing_targets_master` t
+  ON FORMAT_DATE('%Y-%m-01', d.date) = CAST(t.month AS STRING)
+ AND d.channel = t.channel;
