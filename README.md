@@ -6,8 +6,6 @@ An enterprise-grade data warehouse architecture built on **Google BigQuery** and
 
 ## 🏗️ Architecture Overview
 
-## 🏗️ Architecture Overview
-
 ```mermaid
 flowchart TD
     subgraph Inputs ["1. Data Inputs"]
