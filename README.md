@@ -67,6 +67,7 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Spend Target` | `NUMERIC` | Allocated monthly budget (£) |
 | `Conversions Target` | `INTEGER` | Target conversion volume |
 | `Target CPA` | `NUMERIC` | Benchmark cost-per-acquisition (£) |
+| `Revenue Target` | `NUMERIC` | Target Revenue (£) |
 | `Notes` | `STRING` | Strategic context (e.g., `Spring Campaign Push`) |
 
 ---
