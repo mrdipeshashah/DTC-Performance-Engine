@@ -6,26 +6,32 @@ An enterprise-grade data warehouse architecture built on **Google BigQuery** and
 
 ## 🏗️ Architecture Overview
 
-┌─────────────────────────┐
-│     Google Sheets       │  (Static/Human Inputs: Targets, CPAs)
-│ Marketing_Targets_Master│───────┐
-└─────────────────────────┘       │
-│ (BigQuery Sheet Link / Connector)
-┌─────────────────────────┐       │
-│        Funnel.io        │───────┼──────────┐
-│  (Paid Media APIs)      │       │          │
-└─────────────────────────┘       │          ▼
-│   ┌──────────────┐      ┌─────────────────────────┐
-┌─────────────────────────┐       └──►│  Google      │─────►│ Unified Pacing View     │
-│    GA4 BigQuery Export  │──────────►│  BigQuery    │      │  (SQL FULL OUTER JOIN)  │
-│  (Web Delivery Stream)  │           └──────────────┘      └────────────┬────────────┘
-└─────────────────────────┘                                              │
-▼
-┌─────────────────────────┐
-│  Pacing Dashboard       │
-│  (Looker Studio / BI)   │
-└─────────────────────────┘
+## 🏗️ Architecture Overview
 
+```mermaid
+flowchart TD
+    subgraph Inputs ["1. Data Inputs"]
+        GS["📄 Google Sheets<br/><i>(Marketing_Targets_Master)</i>"]
+        FIO["🔌 Funnel.io<br/><i>(Paid Media APIs)</i>"]
+        GA4["📈 GA4 Export<br/><i>(Web Delivery Stream)</i>"]
+    end
+
+    subgraph DataWarehouse ["2. BigQuery Data Warehouse"]
+        BQ[("Google BigQuery")]
+        SQLView["⚡ Unified Pacing View<br/><i>(SQL FULL OUTER JOIN)</i>"]
+    end
+
+    subgraph Visualization ["3. Reporting & BI"]
+        LS["📊 Pacing Dashboard<br/><i>(Looker Studio / BI)</i>"]
+    end
+
+    GS -->|BigQuery Sheet Link| BQ
+    FIO -->|Automated API Pipeline| BQ
+    GA4 -->|Daily Streaming Export| BQ
+
+    BQ --> SQLView
+    SQLView --> LS
+```
 
 ## 📊 Data Requirements & Schema
 
