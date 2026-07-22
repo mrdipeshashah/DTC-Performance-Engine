@@ -48,7 +48,7 @@ unified_channel_delivery AS (
    AND p.channel = g.channel
 )
 
--- Final Join: Unified Marketing + Financial Actuals + Targets
+-- Final Join: Marketing Delivery + Shopify Financials + Targets
 SELECT 
   d.date,
   FORMAT_DATE('%Y-%m-01', d.date) AS month_start,
@@ -70,10 +70,15 @@ SELECT
   COALESCE(t.target_cpa, 0) AS target_cpa,
   COALESCE(t.revenue_target, 0) AS revenue_target,
   
-  -- Key Pacing % Performance Calculations
+  -- Channel Pacing Metrics
   SAFE_DIVIDE(d.actual_cost, NULLIF(t.spend_target, 0)) AS spend_pacing_pct,
   SAFE_DIVIDE(d.actual_conversions, NULLIF(t.conversions_target, 0)) AS conversion_pacing_pct,
-  SAFE_DIVIDE(d.actual_ga_revenue, NULLIF(t.revenue_target, 0)) AS revenue_pacing_pct
+  SAFE_DIVIDE(d.actual_ga_revenue, NULLIF(t.revenue_target, 0)) AS revenue_pacing_pct,
+
+  -- Macro Financial Efficiency Metrics
+  SAFE_DIVIDE(s.total_shopify_revenue, NULLIF(d.actual_cost, 0)) AS mer,
+  SAFE_DIVIDE(d.actual_cost, NULLIF(s.total_shopify_orders, 0)) AS blended_cac
+
 FROM unified_channel_delivery d
 LEFT JOIN daily_shopify_actuals s 
   ON d.date = s.date
