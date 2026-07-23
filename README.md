@@ -42,6 +42,7 @@ Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily le
 | :--- | :--- | :--- |
 | `Date` | `DATE` | Event date (`YYYY-MM-DD`) |
 | `Channel` | `STRING` | Paid channel identifier (e.g., `Paid Search`, `Paid Social`) |
+| `Campaign` | `STRING` | Campaign identifier (e.g., `Branded`, `BFCM-2026`) |
 | `Cost` | `NUMERIC` | Gross spend amount (£) |
 | `Impressions` | `INTEGER` | Total ad impressions |
 | `Clicks` | `INTEGER` | Total ad clicks |
@@ -64,6 +65,7 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | :--- | :--- | :--- |
 | `Month` | `DATE` | Target month start date (`YYYY-MM-01`) |
 | `Channel` | `STRING` | Marketing channel |
+| `Campaign` | `STRING` | Campaign identifier (e.g., `Branded`, `BFCM-2026`) |
 | `Spend Target` | `NUMERIC` | Allocated monthly budget (£) |
 | `Conversions Target` | `INTEGER` | Target conversion volume |
 | `Target CPA` | `NUMERIC` | Benchmark cost-per-acquisition (£) |
