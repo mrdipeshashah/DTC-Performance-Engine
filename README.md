@@ -86,9 +86,9 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 
 ---
 
-## 📐 Spreadsheet to BigQuery Field & Calculation Mapping
+## 📐 Master Spreadsheet to BigQuery Field & Calculation Mapping
 
-This table maps traditional pacing spreadsheet formulas directly to their BigQuery SQL view equivalents.
+This table maps traditional pacing spreadsheet formulas and backend data streams directly to their BigQuery SQL view equivalents.
 
 | Spreadsheet Field Name | BigQuery Column Name | Data Type | SQL / Logic Equivalent | Business Context |
 | :--- | :--- | :--- | :--- | :--- |
@@ -96,6 +96,7 @@ This table maps traditional pacing spreadsheet formulas directly to their BigQue
 | **Day of month** | `day_of_month` | `INT64` | `EXTRACT(DAY FROM date)` | Current day number (MTD elapsed days) |
 | **Remaining days** | `remaining_days` | `INT64` | `days_in_month - day_of_month` | Days left in the month to adjust pacing |
 | **% Days in month** | `pct_days_in_month` | `NUMERIC` | `day_of_month / days_in_month` | Expected target completion baseline % |
+| **Campaign Name** | `campaign_name` | `STRING` | `COALESCE(campaign, 'All Campaigns')` | Optional ad campaign detail (Paid Media layer) |
 | **Forecasted / Budget** | `budget` | `NUMERIC` | `COALESCE(t.spend_target, 0)` | Monthly spend target from Google Sheets |
 | **Delivered / Spend MTD**| `spend_mtd` | `NUMERIC` | `SUM(cost)` | Actual gross spend delivered Month-To-Date |
 | **% Delivered** | `pct_delivered_spend` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, budget)` | Raw budget consumption percentage |
@@ -106,11 +107,21 @@ This table maps traditional pacing spreadsheet formulas directly to their BigQue
 | **Difference vs Budget (£)**| `diff_vs_budget_spend_amt` | `NUMERIC` | `spend_run_rate_expected - budget` | Projected £ over/under spend variance at month end |
 | **Difference vs Budget (%)**| `diff_vs_budget_spend_pct` | `NUMERIC` | `SAFE_DIVIDE(diff_vs_budget_spend_amt, budget)` | Projected % over/under spend variance at month end |
 | **Acqs Target** | `acqs_target` | `INT64` | `COALESCE(t.conversions_target, 0)` | Monthly conversion target from Google Sheets |
-| **Acqs MTD** | `acqs_mtd` | `INT64` | `SUM(actual_conversions)` | Actual conversions delivered Month-To-Date |
+| **Acqs MTD** | `acqs_mtd` | `INT64` | `SUM(actual_conversions)` | Actual conversions delivered Month-To-Date (GA4) |
 | **Acqs Expected Delivery**| `acqs_run_rate_expected` | `NUMERIC` | `(acqs_mtd / day_of_month) * days_in_month` | End-of-month projected total conversions |
 | **Acqs Diff vs Budget (#)**| `diff_vs_budget_acqs_amt` | `NUMERIC` | `acqs_run_rate_expected - acqs_target` | Projected conversion volume variance at month end |
 | **Acqs Diff vs Budget (%)**| `diff_vs_budget_acqs_pct` | `NUMERIC` | `SAFE_DIVIDE(diff_vs_budget_acqs_amt, acqs_target)` | Projected conversion percentage variance at month end |
 | **Store Net Revenue** | `total_shopify_revenue` | `NUMERIC` | `SUM(shopify_revenue)` | Top-line financial source of truth (Shopify API) |
-| **MER** | `mer` | `NUMERIC` | `SAFE_DIVIDE(total_shopify_revenue, spend_mtd)` | Marketing Efficiency Ratio (Total Sales / Ad Spend) |
-| **Blended CAC** | `blended_cac` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, total_shopify_orders)` | Blended Acquisition Cost (Ad Spend / Store Orders) |
+| **Shopify Orders** | `total_shopify_orders` | `NUMERIC` | `SUM(shopify_orders)` | Total store transactions processed (Shopify API) |
+| **Total Customers Target**| `total_customers_target` | `INT64` | `COALESCE(t.total_customers_target, 0)` | Overall monthly customer target from Google Sheets |
+| **New Customers Target** | `new_customers_target` | `INT64` | `COALESCE(t.new_customers_target, 0)` | Monthly new customer acquisition target |
+| **Total Customers Actual**| `total_shopify_customers`| `INT64` | `SUM(shopify_total_customers)` | Total unique purchasing customers MTD |
+| **New Customers Actual** | `total_new_customers` | `INT64` | `SUM(shopify_new_customers)` | First-time purchasing customers MTD |
+| **MER (Actual)** | `mer` | `NUMERIC` | `SAFE_DIVIDE(total_shopify_revenue, spend_mtd)` | Marketing Efficiency Ratio (Total Revenue / Ad Spend) |
+| **MER (Target)** | `target_mer` | `NUMERIC` | `SAFE_DIVIDE(t.revenue_target, t.spend_target)` | Target Marketing Efficiency Ratio |
+| **Blended CAC (Actual)** | `blended_cac` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, total_shopify_orders)` | Blended Acquisition Cost (Ad Spend / Store Orders) |
+| **Blended CAC (Target)** | `target_blended_cac` | `NUMERIC` | `SAFE_DIVIDE(t.spend_target, t.total_customers_target)` | Target Blended Acquisition Cost |
+| **NC-CAC (Actual)** | `new_customer_cac` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, total_new_customers)` | New Customer Acquisition Cost (Ad Spend / New Cust) |
+| **NC-CAC (Target)** | `target_nc_cac` | `NUMERIC` | `SAFE_DIVIDE(t.spend_target, t.new_customers_target)` | Target New Customer Acquisition Cost |
+
 
