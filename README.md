@@ -47,7 +47,7 @@ Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily le
 | `Impressions` | `INTEGER` | Total ad impressions |
 | `Clicks` | `INTEGER` | Total ad clicks |
 
-### 2. Web Analytics Delivery Schema (e.g., via GA4 Export)
+### 2. Google Analytics Delivery Schema (via GA4 Export)
 Tracks site-level sessions and conversion activity for **all traffic sources** (Paid & Organic).
 
 | Field Name | Type | Description |
@@ -58,7 +58,7 @@ Tracks site-level sessions and conversion activity for **all traffic sources** (
 | `GA Transactions`| `INTEGER` | Completed conversions/orders |
 | `GA Revenue` | `NUMERIC` | Total attributed revenue (£) |
 
-### 3. Targets Schema (Google Sheets Input)
+### 3. Channel Targets Schema (Google Sheets Input)
 Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
@@ -71,6 +71,18 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Target CPA` | `NUMERIC` | Benchmark cost-per-acquisition (£) |
 | `Revenue Target` | `NUMERIC` | Target Revenue (£) |
 | `Notes` | `STRING` | Strategic context (e.g., `Spring Campaign Push`) |
+
+### 3. All Targets Schema (Google Sheets Input)
+Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
+
+| Field Name | Type | Description |
+| :--- | :--- | :--- |
+| `Month` | `DATE` | Target month start date (`YYYY-MM-01`) |
+| `Spend Target` | `NUMERIC` | Allocated monthly budget (£) |
+| `Conversions Target` | `INTEGER` | Target conversion volume |
+| `Revenue Target` | `NUMERIC` | Target Revenue (£) |
+| `Total_Customers_Target` | `INTEGER` | Total Custoemr Target volume |
+| `New_Customers_Target` | `INTEGER` | New Custoemr Target volume |
 
 ---
 
