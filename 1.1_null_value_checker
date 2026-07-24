@@ -1,0 +1,47 @@
+SELECT 
+  'shopify' AS table_name,
+  COUNTIF(Date IS NULL) AS null_dates,
+  COUNTIF(Shopify_Revenue IS NULL) AS null_revenue_or_cost,
+  COUNTIF(Profit IS NULL) AS null_profit_or_conversions,
+  COUNTIF(Shopify_Orders IS NULL) AS null_orders_or_sessions
+FROM `mrdipeshashah.Forecasting.shopify`
+
+UNION ALL
+
+SELECT 
+  'paidmedia',
+  COUNTIF(Date IS NULL),
+  COUNTIF(Cost IS NULL),
+  COUNTIF(Clicks IS NULL),
+  COUNTIF(Impressions IS NULL)
+FROM `mrdipeshashah.Forecasting.paidmedia`
+
+UNION ALL
+
+SELECT 
+  'googleanalytics',
+  COUNTIF(Date IS NULL),
+  COUNTIF(GA_Revenue IS NULL),
+  COUNTIF(GA_Transactions IS NULL),
+  COUNTIF(Sessions IS NULL)
+FROM `mrdipeshashah.Forecasting.googleanalytics`
+
+UNION ALL
+
+SELECT 
+  'channelstarget',
+  COUNTIF(Month IS NULL),
+  COUNTIF(Spend_Target IS NULL),
+  COUNTIF(Revenue_Target IS NULL),
+  COUNTIF(Conversions_Target IS NULL)
+FROM `mrdipeshashah.Forecasting.channelstarget`
+
+UNION ALL
+
+SELECT 
+  'alltargets',
+  COUNTIF(Month IS NULL),
+  COUNTIF(Spend_Target IS NULL),
+  COUNTIF(Profit_Target IS NULL),
+  COUNTIF(Conversions_Target IS NULL)
+FROM `mrdipeshashah.Forecasting.alltargets`;
