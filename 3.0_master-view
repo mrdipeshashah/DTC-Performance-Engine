@@ -1,0 +1,61 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_daily_performance` AS
+WITH dates AS (
+  SELECT DISTINCT date FROM `mrdipeshashah.Forecasting.stg_shopify`
+),
+paid_daily AS (
+  SELECT 
+    date,
+    SUM(cost) AS total_cost,
+    SUM(clicks) AS total_clicks,
+    SUM(impressions) AS total_impressions
+  FROM `mrdipeshashah.Forecasting.stg_paidmedia`
+  GROUP BY 1
+),
+ga_daily AS (
+  SELECT 
+    date,
+    SUM(sessions) AS total_sessions,
+    SUM(ga_transactions) AS total_ga_transactions,
+    SUM(ga_revenue) AS total_ga_revenue
+  FROM `mrdipeshashah.Forecasting.stg_googleanalytics`
+  GROUP BY 1
+)
+SELECT
+  d.date,
+  DATE_TRUNC(d.date, MONTH) AS month,
+  
+  -- Shopify Actuals
+  s.shopify_orders,
+  s.shopify_revenue,
+  s.total_customers,
+  s.new_customers,
+  s.profit AS shopify_profit,
+  
+  -- Paid Media Actuals
+  COALESCE(p.total_cost, 0) AS ad_spend,
+  COALESCE(p.total_clicks, 0) AS clicks,
+  COALESCE(p.total_impressions, 0) AS impressions,
+  
+  -- GA Actuals
+  COALESCE(g.total_sessions, 0) AS sessions,
+  COALESCE(g.total_ga_transactions, 0) AS ga_transactions,
+  COALESCE(g.total_ga_revenue, 0) AS ga_revenue,
+
+  -- Targets (Prorated Daily Target = Monthly Target / Days in Month)
+  ROUND(t.revenue_target / EXTRACT(DAY FROM LAST_DAY(d.date)), 2) AS daily_revenue_target,
+  ROUND(t.spend_target / EXTRACT(DAY FROM LAST_DAY(d.date)), 2) AS daily_spend_target,
+  ROUND(t.profit_target / EXTRACT(DAY FROM LAST_DAY(d.date)), 2) AS daily_profit_target,
+  ROUND(t.conversions_target / EXTRACT(DAY FROM LAST_DAY(d.date)), 2) AS daily_orders_target,
+
+  -- Calculated Ratios
+  SAFE_DIVIDE(s.profit, p.total_cost) AS poas,
+  SAFE_DIVIDE(s.shopify_revenue, p.total_cost) AS roas,
+  SAFE_DIVIDE(s.profit, s.shopify_revenue) AS profit_margin_pct,
+  SAFE_DIVIDE(p.total_cost, s.shopify_orders) AS blended_cpa,
+  SAFE_DIVIDE(p.total_cost, s.new_customers) AS blended_cac
+
+FROM dates d
+LEFT JOIN `mrdipeshashah.Forecasting.stg_shopify` s ON d.date = s.date
+LEFT JOIN paid_daily p ON d.date = p.date
+LEFT JOIN ga_daily g ON d.date = g.date
+LEFT JOIN `mrdipeshashah.Forecasting.stg_alltargets` t ON DATE_TRUNC(d.date, MONTH) = t.target_month;
