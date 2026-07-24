@@ -1,0 +1,35 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_channel_performance` AS
+WITH daily_channel_actuals AS (
+  SELECT
+    p.date,
+    p.channel,
+    SUM(p.cost) AS ad_spend,
+    SUM(p.clicks) AS clicks,
+    SUM(p.impressions) AS impressions,
+    COALESCE(SUM(g.sessions), 0) AS sessions,
+    COALESCE(SUM(g.ga_transactions), 0) AS ga_transactions,
+    COALESCE(SUM(g.ga_revenue), 0) AS ga_revenue
+  FROM `mrdipeshashah.Forecasting.stg_paidmedia` p
+  LEFT JOIN `mrdipeshashah.Forecasting.stg_googleanalytics` g 
+    ON p.date = g.date AND LOWER(p.channel) = LOWER(g.channel)
+  GROUP BY 1, 2
+)
+SELECT
+  a.date,
+  DATE_TRUNC(a.date, MONTH) AS month,
+  a.channel,
+  a.ad_spend,
+  a.clicks,
+  a.impressions,
+  a.sessions,
+  a.ga_transactions,
+  a.ga_revenue,
+  
+  -- Calculated Metrics
+  SAFE_DIVIDE(a.ad_spend, a.clicks) AS cpc,
+  SAFE_DIVIDE(a.ad_spend, (a.impressions / 1000.0)) AS cpm,
+  SAFE_DIVIDE(a.clicks, a.impressions) AS ctr,
+  SAFE_DIVIDE(a.ga_revenue, a.ad_spend) AS channel_roas,
+  SAFE_DIVIDE(a.ad_spend, a.ga_transactions) AS channel_cpa
+
+FROM daily_channel_actuals a;
