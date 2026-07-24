@@ -1,5 +1,47 @@
 SELECT 
-  ROUND(SUM(s.Shopify_Revenue), 2) AS total_shopify_revenue,
-  ROUND(SUM(s.Profit), 2) AS total_shopify_profit,
-  ROUND((SELECT SUM(Cost) FROM `mrdipeshashah.Forecasting.paidmedia`), 2) AS total_ad_spend
-FROM `mrdipeshashah.Forecasting.shopify` s;
+  'shopify' AS table_name,
+  ROUND(SUM(Shopify_Revenue), 2) AS total_revenue,
+  ROUND(SUM(Profit), 2) AS total_profit,
+  0.00 AS total_spend,
+  SUM(Shopify_Orders) AS total_orders_or_conversions
+FROM `mrdipeshashah.Forecasting.shopify`
+
+UNION ALL
+
+SELECT 
+  'paidmedia',
+  0.00,
+  0.00,
+  ROUND(SUM(Cost), 2),
+  0
+FROM `mrdipeshashah.Forecasting.paidmedia`
+
+UNION ALL
+
+SELECT 
+  'googleanalytics',
+  ROUND(SUM(GA_Revenue), 2),
+  0.00,
+  0.00,
+  SUM(GA_Transactions)
+FROM `mrdipeshashah.Forecasting.googleanalytics`
+
+UNION ALL
+
+SELECT 
+  'channelstarget',
+  ROUND(SUM(Revenue_Target), 2),
+  0.00,
+  ROUND(SUM(Spend_Target), 2),
+  SUM(Conversions_Target)
+FROM `mrdipeshashah.Forecasting.channelstarget`
+
+UNION ALL
+
+SELECT 
+  'alltargets',
+  ROUND(SUM(Revenue_Target), 2),
+  ROUND(SUM(Profit_Target), 2),
+  ROUND(SUM(Spend_Target), 2),
+  SUM(Conversions_Target)
+FROM `mrdipeshashah.Forecasting.alltargets`;
