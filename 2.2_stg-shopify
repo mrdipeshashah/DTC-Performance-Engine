@@ -1,0 +1,10 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_shopify` AS
+SELECT
+  CAST(Date AS DATE) AS date,
+  COALESCE(Shopify_Orders, 0) AS shopify_orders,
+  COALESCE(Shopify_Revenue, 0) AS shopify_revenue,
+  COALESCE(Total_Customers, 0) AS total_customers,
+  COALESCE(New_Customers, 0) AS new_customers,
+  COALESCE(Profit, 0) AS profit
+FROM `mrdipeshashah.Forecasting.shopify`
+WHERE Date IS NOT NULL;
