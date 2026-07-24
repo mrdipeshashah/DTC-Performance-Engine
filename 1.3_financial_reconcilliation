@@ -1,0 +1,5 @@
+SELECT 
+  ROUND(SUM(s.Shopify_Revenue), 2) AS total_shopify_revenue,
+  ROUND(SUM(s.Profit), 2) AS total_shopify_profit,
+  ROUND((SELECT SUM(Cost) FROM `mrdipeshashah.Forecasting.paidmedia`), 2) AS total_ad_spend
+FROM `mrdipeshashah.Forecasting.shopify` s;
