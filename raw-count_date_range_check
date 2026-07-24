@@ -1,0 +1,9 @@
+SELECT 'PaidMedia' AS table_name, COUNT(*) AS total_rows, MIN(Date) AS min_date, MAX(Date) AS max_date FROM `mrdipeshashah.Forecasting.paidmedia`
+UNION ALL
+SELECT 'GoogleAnalytics', COUNT(*), MIN(Date), MAX(Date) FROM `mrdipeshashah.Forecasting.googleanalytics`
+UNION ALL
+SELECT 'Shopify', COUNT(*), MIN(Date), MAX(Date) FROM `mrdipeshashah.Forecasting.shopify`
+UNION ALL
+SELECT 'ChannelsTargets', COUNT(*), MIN(Month), MAX(Month) FROM `mrdipeshashah.Forecasting.channelstarget`
+UNION ALL
+SELECT 'AllTargets', COUNT(*), MIN(Month), MAX(Month) FROM `mrdipeshashah.Forecasting.alltargets`;
