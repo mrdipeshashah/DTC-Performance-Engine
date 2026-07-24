@@ -1,0 +1,9 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_googleanalytics` AS
+SELECT
+  CAST(Date AS DATE) AS date,
+  TRIM(Channel) AS channel,
+  COALESCE(Sessions, 0) AS sessions,
+  COALESCE(GA_Transactions, 0) AS ga_transactions,
+  COALESCE(GA_Revenue, 0) AS ga_revenue
+FROM `mrdipeshashah.Forecasting.googleanalytics`
+WHERE Date IS NOT NULL;
