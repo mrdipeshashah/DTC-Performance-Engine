@@ -58,7 +58,19 @@ Tracks site-level sessions and conversion activity for **all traffic sources** (
 | `GA Transactions`| `INTEGER` | Completed conversions/orders |
 | `GA Revenue` | `NUMERIC` | Total attributed revenue (£) |
 
-### 3. Channel Targets Schema (Google Sheets Input)
+### 3. Key Business Metrics Delivery Schema
+Tracking key business metrics 
+
+| Field Name | Type | Description |
+| :--- | :--- | :--- |
+| `Date` | `DATE` | Event date (`YYYY-MM-DD`) |
+| `Shopify Orders` | `INTEGER` | Total orders coming from shopify |
+| `Shopify Revenue` | `NUMERIC` | Total revenue (£) coming from shopify |
+| `Total_Customers_Target` | `INTEGER` | Total Customer volume |
+| `New_Customers_Target` | `INTEGER` | New Customer volume |
+| `Profit Target` | `NUMERIC` | Profit (£) |
+
+### 4. Channel Targets Schema (Google Sheets Input)
 Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
@@ -72,7 +84,7 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Revenue Target` | `NUMERIC` | Target Revenue (£) |
 | `Notes` | `STRING` | Strategic context (e.g., `Spring Campaign Push`) |
 
-### 3. All Targets Schema (Google Sheets Input)
+### 5. All Targets Schema (Google Sheets Input)
 Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
@@ -83,6 +95,9 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Revenue Target` | `NUMERIC` | Target Revenue (£) |
 | `Total_Customers_Target` | `INTEGER` | Total Custoemr Target volume |
 | `New_Customers_Target` | `INTEGER` | New Custoemr Target volume |
+| `Profit Target` | `NUMERIC` | Target Profit (£) |
+
+
 
 ---
 
