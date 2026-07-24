@@ -97,46 +97,74 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `New_Customers_Target` | `INTEGER` | New Custoemr Target volume |
 | `Profit Target` | `NUMERIC` | Target Profit (£) |
 
+---
 
+# Master Data Dictionary & Field Mapping Reference
+
+This reference maps all 5 raw Google Sheets tabs to raw BigQuery schema fields and defines the standardized calculation logic for downstream SQL modeling and Looker Studio reporting.
 
 ---
 
-## 📐 Master Spreadsheet to BigQuery Field & Calculation Mapping
+## 📑 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
 
-This table maps traditional pacing spreadsheet formulas and backend data streams directly to their BigQuery SQL view equivalents.
-
-| Spreadsheet Field Name | BigQuery Column Name | Data Type | SQL / Logic Equivalent | Business Context |
+| Source Sheet Tab | Google Sheet Header | BigQuery Field Name | Data Type | Notes / Clean Transformations |
 | :--- | :--- | :--- | :--- | :--- |
-| **Days in month** | `days_in_month` | `INT64` | `EXTRACT(DAY FROM LAST_DAY(date))` | Total calendar days in the current target month |
-| **Day of month** | `day_of_month` | `INT64` | `EXTRACT(DAY FROM date)` | Current day number (MTD elapsed days) |
-| **Remaining days** | `remaining_days` | `INT64` | `days_in_month - day_of_month` | Days left in the month to adjust pacing |
-| **% Days in month** | `pct_days_in_month` | `NUMERIC` | `day_of_month / days_in_month` | Expected target completion baseline % |
-| **Campaign Name** | `campaign_name` | `STRING` | `COALESCE(campaign, 'All Campaigns')` | Optional ad campaign detail (Paid Media layer) |
-| **Forecasted / Budget** | `budget` | `NUMERIC` | `COALESCE(t.spend_target, 0)` | Monthly spend target from Google Sheets |
-| **Delivered / Spend MTD**| `spend_mtd` | `NUMERIC` | `SUM(cost)` | Actual gross spend delivered Month-To-Date |
-| **% Delivered** | `pct_delivered_spend` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, budget)` | Raw budget consumption percentage |
-| **Avg run rate** | `avg_target_run_rate_spend` | `NUMERIC` | `budget / days_in_month` | Daily spend required to hit monthly target exactly |
-| **Current run rate** | `current_run_rate_spend` | `NUMERIC` | `spend_mtd / day_of_month` | Actual daily spend velocity MTD |
-| **Expected delivery** | `spend_run_rate_expected` | `NUMERIC` | `current_run_rate_spend * days_in_month` | End-of-month projected total spend if current pace continues |
-| **Remaining sales / spend**| `remaining_spend` | `NUMERIC` | `budget - spend_mtd` | Remaining budget left to deploy |
-| **Difference vs Budget (£)**| `diff_vs_budget_spend_amt` | `NUMERIC` | `spend_run_rate_expected - budget` | Projected £ over/under spend variance at month end |
-| **Difference vs Budget (%)**| `diff_vs_budget_spend_pct` | `NUMERIC` | `SAFE_DIVIDE(diff_vs_budget_spend_amt, budget)` | Projected % over/under spend variance at month end |
-| **Acqs Target** | `acqs_target` | `INT64` | `COALESCE(t.conversions_target, 0)` | Monthly conversion target from Google Sheets |
-| **Acqs MTD** | `acqs_mtd` | `INT64` | `SUM(actual_conversions)` | Actual conversions delivered Month-To-Date (GA4) |
-| **Acqs Expected Delivery**| `acqs_run_rate_expected` | `NUMERIC` | `(acqs_mtd / day_of_month) * days_in_month` | End-of-month projected total conversions |
-| **Acqs Diff vs Budget (#)**| `diff_vs_budget_acqs_amt` | `NUMERIC` | `acqs_run_rate_expected - acqs_target` | Projected conversion volume variance at month end |
-| **Acqs Diff vs Budget (%)**| `diff_vs_budget_acqs_pct` | `NUMERIC` | `SAFE_DIVIDE(diff_vs_budget_acqs_amt, acqs_target)` | Projected conversion percentage variance at month end |
-| **Store Net Revenue** | `total_shopify_revenue` | `NUMERIC` | `SUM(shopify_revenue)` | Top-line financial source of truth (Shopify API) |
-| **Shopify Orders** | `total_shopify_orders` | `NUMERIC` | `SUM(shopify_orders)` | Total store transactions processed (Shopify API) |
-| **Total Customers Target**| `total_customers_target` | `INT64` | `COALESCE(t.total_customers_target, 0)` | Overall monthly customer target from Google Sheets |
-| **New Customers Target** | `new_customers_target` | `INT64` | `COALESCE(t.new_customers_target, 0)` | Monthly new customer acquisition target |
-| **Total Customers Actual**| `total_shopify_customers`| `INT64` | `SUM(shopify_total_customers)` | Total unique purchasing customers MTD |
-| **New Customers Actual** | `total_new_customers` | `INT64` | `SUM(shopify_new_customers)` | First-time purchasing customers MTD |
-| **MER (Actual)** | `mer` | `NUMERIC` | `SAFE_DIVIDE(total_shopify_revenue, spend_mtd)` | Marketing Efficiency Ratio (Total Revenue / Ad Spend) |
-| **MER (Target)** | `target_mer` | `NUMERIC` | `SAFE_DIVIDE(t.revenue_target, t.spend_target)` | Target Marketing Efficiency Ratio |
-| **Blended CAC (Actual)** | `blended_cac` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, total_shopify_orders)` | Blended Acquisition Cost (Ad Spend / Store Orders) |
-| **Blended CAC (Target)** | `target_blended_cac` | `NUMERIC` | `SAFE_DIVIDE(t.spend_target, t.total_customers_target)` | Target Blended Acquisition Cost |
-| **NC-CAC (Actual)** | `new_customer_cac` | `NUMERIC` | `SAFE_DIVIDE(spend_mtd, total_new_customers)` | New Customer Acquisition Cost (Ad Spend / New Cust) |
-| **NC-CAC (Target)** | `target_nc_cac` | `NUMERIC` | `SAFE_DIVIDE(t.spend_target, t.new_customers_target)` | Target New Customer Acquisition Cost |
+| **`PaidMedia`** | Date | `Date` | `DATE` | Link Range: `PaidMedia!A1:F` |
+| | Channel | `Channel` | `STRING` | Standardized channel string |
+| | Campaign | `Campaign` | `STRING` | Campaign name grouping |
+| | Cost | `Cost` | `NUMERIC` | Raw ad spend |
+| | Impressions | `Impressions` | `INTEGER` | Total ad impressions |
+| | Clicks | `Clicks` | `INTEGER` | Total ad clicks |
+| **`GoogleAnalytics`** | Date | `Date` | `DATE` | Link Range: `GoogleAnalytics!A1:E` |
+| | Channel | `Channel` | `STRING` | Web traffic source grouping |
+| | Sessions | `Sessions` | `INTEGER` | GA4 session counts |
+| | GA Transactions | `GA_Transactions` | `INTEGER` | Web order conversions |
+| | GA Revenue | `GA_Revenue` | `NUMERIC` | E-commerce revenue |
+| **`Shopify`** | Date | `Date` | `DATE` | Link Range: `Shopify!A1:F` |
+| | Shopify_Orders | `Shopify_Orders` | `INTEGER` | Order count from ERP/Store |
+| | Shopify_Revenue | `Shopify_Revenue` | `NUMERIC` | Gross shop revenue |
+| | Total_Customers | `Total_Customers` | `INTEGER` | Total active buying customers |
+| | New_Customers | `New_Customers` | `INTEGER` | First-time buyers |
+| | **Profit** | **`Profit`** | **`NUMERIC`** | **Net/Gross Profit (£)** |
+| **`ChannelsTargets`** | Month | `Month` | `DATE` | Link Range: `ChannelsTargets!A1:H` |
+| | Channel | `Channel` | `STRING` | Target channel |
+| | Campaign | `Campaign` | `STRING` | Target campaign |
+| | Spend Target | `Spend_Target` | `NUMERIC` | Planned channel spend |
+| | Conversions Target | `Conversions_Target` | `INTEGER` | Target channel conversions |
+| | Target CPA | `Target_CPA` | `NUMERIC` | Target CPA benchmark |
+| | Revenue Target | `Revenue_Target` | `NUMERIC` | Target channel revenue |
+| | Notes | `Notes` | `STRING` | Context notes |
+| **`AllTargets`** | Month | `Month` | `DATE` | Link Range: `AllTargets!A1:G` |
+| | Spend Target | `Spend_Target` | `NUMERIC` | Total store spend target |
+| | Conversions Target | `Conversions_Target` | `INTEGER` | Total store order target |
+| | Revenue Target | `Revenue_Target` | `NUMERIC` | Total store revenue target |
+| | Total_Customers_Target | `Total_Customers_Target` | `INTEGER` | Total buyer target |
+| | New_Customers_Target | `New_Customers_Target` | `INTEGER` | New buyer target |
+| | **Profit_Target** | **`Profit_Target`** | **`NUMERIC`** | **Store Gross Profit Target** |
 
+---
+
+## 🧮 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
+
+### Core Blended Metrics
+
+* **POAS (Profit on Ad Spend):** `Shopify Profit / Paid Media Cost`
+* **ROAS (Return on Ad Spend):** `Shopify Revenue / Paid Media Cost`
+* **Gross Profit Margin %:** `Shopify Profit / Shopify Revenue`
+* **Blended CPA:** `Paid Media Cost / Shopify Orders`
+* **Blended CAC (New Customers):** `Paid Media Cost / New Customers`
+
+---
+
+### Profit & Pacing SQL Logic
+
+```sql
+-- Daily Target Run-Rate (Overall Profit Target / Days in Month)
+COALESCE(t.Profit_Target, 0) / EXTRACT(DAY FROM LAST_DAY(r.date)) AS daily_profit_target,
+
+-- Month-to-Date Profit Delivery %
+SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
+
+-- Projected Month-End Profit Variance (£)
+((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM CURRENT_DATE())) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
 
