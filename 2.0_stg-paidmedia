@@ -1,0 +1,10 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_paidmedia` AS
+SELECT
+  CAST(Date AS DATE) AS date,
+  TRIM(Channel) AS channel,
+  TRIM(Campaign) AS campaign,
+  COALESCE(Cost, 0) AS cost,
+  COALESCE(Impressions, 0) AS impressions,
+  COALESCE(Clicks, 0) AS clicks
+FROM `mrdipeshashah.Forecasting.paidmedia`
+WHERE Date IS NOT NULL;
