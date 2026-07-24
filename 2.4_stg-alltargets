@@ -1,0 +1,11 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_alltargets` AS
+SELECT
+  CAST(Month AS DATE) AS target_month,
+  COALESCE(Spend_Target, 0) AS spend_target,
+  COALESCE(Conversions_Target, 0) AS conversions_target,
+  COALESCE(Revenue_Target, 0) AS revenue_target,
+  COALESCE(Total_Customers_Target, 0) AS total_customers_target,
+  COALESCE(New_Customers_Target, 0) AS new_customers_target,
+  COALESCE(Profit_Target, 0) AS profit_target
+FROM `mrdipeshashah.Forecasting.alltargets`
+WHERE Month IS NOT NULL;
