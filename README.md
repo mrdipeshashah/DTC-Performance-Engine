@@ -168,3 +168,69 @@ SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 -- Projected Month-End Profit Variance (£)
 ((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM CURRENT_DATE())) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
 
+# Looker Studio Calculated Fields Documentation
+
+This repository contains the calculated field specifications for the BigQuery-backed Looker Studio E-Commerce & Forecasting Dashboard.
+
+---
+
+## Data Source 1: `rpt_daily_performance`
+*Primary dataset for executive summary, overall store health, profitability, customer acquisition, and storewide target pacing.*
+
+### A. Profitability & Unit Economics
+
+| Field Name | Formula | Type | Description |
+| :--- | :--- | :--- | :--- |
+| **POAS (Profit on Ad Spend)** | `SUM(shopify_profit) / SUM(ad_spend)` | Decimal / % | Ratio of total gross profit to ad spend |
+| **Blended ROAS** | `SUM(shopify_revenue) / SUM(ad_spend)` | Decimal | Return on ad spend across all revenue |
+| **Gross Profit Margin %** | `SUM(shopify_profit) / SUM(shopify_revenue)` | Percent | Proportion of net revenue that is gross profit |
+| **Blended CPA** | `SUM(ad_spend) / SUM(shopify_orders)` | Currency (£) | Cost per completed order across all channels |
+| **Blended CAC** | `SUM(ad_spend) / SUM(new_customers)` | Currency (£) | Cost to acquire a new customer |
+| **Average Order Value (AOV)** | `SUM(shopify_revenue) / SUM(shopify_orders)` | Currency (£) | Average revenue generated per order |
+| **Storewide Revenue Per Session** | `SUM(shopify_revenue) / SUM(sessions)` | Currency (£) | Monetary value generated per site session |
+| **Storewide Cost Per Session** | `SUM(ad_spend) / SUM(sessions)` | Currency (£) | Ad spend cost per site session driven |
+
+### B. Target Pacing & Delivery %
+
+| Field Name | Formula | Type | Description |
+| :--- | :--- | :--- | :--- |
+| **Revenue Target Delivery %** | `SUM(shopify_revenue) / SUM(daily_revenue_target)` | Percent | Target delivery pacing for revenue |
+| **Gross Profit Target Delivery %** | `SUM(shopify_profit) / SUM(daily_profit_target)` | Percent | Target delivery pacing for gross profit |
+| **Spend Budget Utilization %** | `SUM(ad_spend) / SUM(daily_spend_target)` | Percent | Ad spend budget consumption vs. daily target |
+| **Order Target Delivery %** | `SUM(shopify_orders) / SUM(daily_orders_target)` | Percent | Target delivery pacing for total orders |
+
+### C. Storewide Variances (£)
+
+| Field Name | Formula | Type | Description |
+| :--- | :--- | :--- | :--- |
+| **Revenue Variance (£)** | `SUM(shopify_revenue) - SUM(daily_revenue_target)` | Currency (£) | Net variance vs. revenue target (+/-) |
+| **Gross Profit Variance (£)** | `SUM(shopify_profit) - SUM(daily_profit_target)` | Currency (£) | Net variance vs. profit target (+/-) |
+| **Spend Variance (£)** | `SUM(ad_spend) - SUM(daily_spend_target)` | Currency (£) | Net variance vs. budget target (+/-) |
+
+### D. Customer & Web Analytics
+
+| Field Name | Formula | Type | Description |
+| :--- | :--- | :--- | :--- |
+| **New Customer Share %** | `SUM(new_customers) / SUM(total_customers)` | Percent | Proportion of orders placed by new customers |
+| **Returning Customer Volume** | `SUM(total_customers) - SUM(new_customers)` | Integer | Volume of returning customers |
+| **Ecommerce CVR (GA4 %)** | `SUM(ga_transactions) / SUM(sessions)` | Percent | Conversion rate according to GA4 |
+| **GA4 Tracking Coverage Ratio %** | `SUM(ga_transactions) / SUM(shopify_orders)` | Percent | GA4 transaction capture rate vs. Shopify |
+
+---
+
+## Data Source 2: `rpt_channel_performance`
+*Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics.*
+
+### E. Channel Efficiency & Ad Economics
+
+| Field Name | Formula | Type | Description |
+| :--- | :--- | :--- | :--- |
+| **Channel ROAS** | `SUM(ga_revenue) / SUM(ad_spend)` | Decimal | Attributed return on ad spend per channel |
+| **Channel CPA** | `SUM(ad_spend) / SUM(ga_transactions)` | Currency (£) | Cost per acquisition per channel |
+| **CPC (Cost Per Click)** | `SUM(ad_spend) / SUM(clicks)` | Currency (£) | Cost per ad click |
+| **CPM (Cost Per Mille)** | `SUM(ad_spend) / (SUM(impressions) / 1000)` | Currency (£) | Cost per 1,000 ad impressions |
+| **CTR (Click-Through Rate)** | `SUM(clicks) / SUM(impressions)` | Percent | Click-through rate on ad impressions |
+| **Revenue Per Session (RPS)** | `SUM(ga_revenue) / SUM(sessions)` | Currency (£) | Attributed revenue per channel session |
+| **Cost Per Session (CPS)** | `SUM(ad_spend) / SUM(sessions)` | Currency (£) | Ad cost to drive one session from channel |
+| **Channel AOV** | `SUM(ga_revenue) / SUM(ga_transactions)` | Currency (£) | Average order value by channel |
+
