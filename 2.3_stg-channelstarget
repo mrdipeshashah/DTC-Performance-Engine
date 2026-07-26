@@ -1,12 +1,11 @@
 CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_channelstarget` AS
 SELECT
-  CAST(Month AS DATE) AS target_month,
-  TRIM(Channel) AS channel,
-  TRIM(Campaign) AS campaign,
-  COALESCE(Spend_Target, 0) AS spend_target,
-  COALESCE(Conversions_Target, 0) AS conversions_target,
-  COALESCE(Target_CPA, 0) AS target_cpa,
-  COALESCE(Revenue_Target, 0) AS revenue_target,
-  TRIM(Notes) AS notes
-FROM `mrdipeshashah.Forecasting.channelstarget`
-WHERE Month IS NOT NULL;
+  CAST(Month AS DATE) AS Month,
+  TRIM(Channel) AS Channel,
+  Campaign,
+  CAST(Spend_Target AS NUMERIC) AS Spend_Target,
+  CAST(Conversions_Target AS INT64) AS Conversions_Target,
+  CAST(Target_CPA AS NUMERIC) AS Target_CPA,
+  CAST(Revenue_Target AS NUMERIC) AS Revenue_Target,
+  Notes
+FROM `mrdipeshashah.Forecasting.channelstarget`;
