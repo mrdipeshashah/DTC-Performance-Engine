@@ -1,0 +1,14 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics` AS
+SELECT
+  -- Formats Date to strict DATE type
+  CAST(Date AS DATE) AS Month,
+  
+  -- Clean Channel name
+  TRIM(Channel) AS Channel,
+  
+  -- Integer & Numeric measures
+  CAST(Sessions AS INT64) AS Sessions,
+  CAST(GA_Transactions AS INT64) AS GA_Transactions,
+  CAST(GA_Revenue AS NUMERIC) AS GA_Revenue
+
+FROM `mrdipeshashah.Forecasting.monthlygoogleanalytics`;
