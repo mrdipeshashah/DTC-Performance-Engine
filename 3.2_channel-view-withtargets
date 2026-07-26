@@ -1,0 +1,11 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_channel_performance_with_targets` AS
+SELECT 
+  p.*,
+  t.Spend_Target AS spend_target,
+  t.Conversions_Target AS conversions_target,
+  t.Target_CPA AS target_cpa,
+  t.Revenue_Target AS revenue_target
+FROM `mrdipeshashah.Forecasting.rpt_channel_performance` p
+LEFT JOIN `mrdipeshashah.Forecasting.channelstarget` t
+  ON DATE_TRUNC(p.date, MONTH) = t.Month
+ AND LOWER(TRIM(p.channel)) = LOWER(TRIM(t.Channel))
