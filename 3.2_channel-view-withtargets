@@ -1,23 +1,30 @@
 CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_channel_performance_with_targets` AS
 SELECT
-  -- Primary Join Keys
-  COALESCE(ga.Date, ct.Month) AS Month,
+  -- Primary Keys
+  COALESCE(ga.Month, ct.Month) AS Month,
   COALESCE(ga.Channel, ct.Channel) AS Channel,
 
-  -- Actuals (from monthlygoogleanalytics)
+  -- Actuals (GA)
   COALESCE(ga.Sessions, 0) AS Actual_Sessions,
   COALESCE(ga.GA_Transactions, 0) AS Actual_Transactions,
   COALESCE(ga.GA_Revenue, 0) AS Actual_Revenue,
 
-  -- Channel Targets (from channelstarget)
+  -- Targets (Channel Targets)
   COALESCE(ct.Spend_Target, 0) AS Target_Spend,
   COALESCE(ct.Conversions_Target, 0) AS Target_Conversions,
   COALESCE(ct.Revenue_Target, 0) AS Target_Revenue,
   ct.Target_CPA,
   ct.Campaign,
-  ct.Notes
+  ct.Notes,
 
-FROM `mrdipeshashah.Forecasting.monthlygoogleanalytics` ga
+  -- Performance Calculations
+  SAFE_DIVIDE(ga.GA_Transactions, ga.Sessions) AS Actual_CVR,
+  SAFE_DIVIDE(ga.GA_Revenue, ga.GA_Transactions) AS Actual_AOV,
+  SAFE_DIVIDE(ga.GA_Revenue, ct.Revenue_Target) AS Revenue_Delivery_Pct,
+  SAFE_DIVIDE(ga.GA_Transactions, ct.Conversions_Target) AS Conversion_Delivery_Pct,
+  (COALESCE(ga.GA_Revenue, 0) - COALESCE(ct.Revenue_Target, 0)) AS Revenue_Variance
+
+FROM `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics` ga
 FULL OUTER JOIN `mrdipeshashah.Forecasting.channelstarget` ct
-  ON ga.Date = ct.Month
+  ON ga.Month = ct.Month
  AND ga.Channel = ct.Channel;
