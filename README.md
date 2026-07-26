@@ -33,10 +33,10 @@ flowchart TD
 
 ## 📊 Data Requirements & Schema
 
-The system unifies three distinct data requirements into a single analytical view.
+The system unifies three distinct data requirements into a single analytical view
 
 ### 1. Paid Media Delivery Schema (e.g., via Funnel.io)
-Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily level.
+Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily level
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
@@ -48,7 +48,9 @@ Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily le
 | `Clicks` | `INTEGER` | Total ad clicks |
 
 ### 2. Google Analytics Delivery Schema (via GA4 Export)
-Tracks site-level sessions and conversion activity for **all traffic sources** (Paid & Organic).
+Tracks site-level sessions and conversion activity for **all traffic sources** (Paid & Organic) 
+
+There will need to be 2 views created a daily and a monthly view. 
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
@@ -61,6 +63,8 @@ Tracks site-level sessions and conversion activity for **all traffic sources** (
 ### 3. Key Business Metrics Delivery Schema
 Tracking key business metrics 
 
+There will need to be 2 views created a daily and a monthly view. 
+
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
 | `Date` | `DATE` | Event date (`YYYY-MM-DD`) |
@@ -71,7 +75,7 @@ Tracking key business metrics
 | `Profit Target` | `NUMERIC` | Profit (£) |
 
 ### 4. Channel Targets Schema (Google Sheets Input)
-Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
+Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`)
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
@@ -85,7 +89,7 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Notes` | `STRING` | Strategic context (e.g., `Spring Campaign Push`) |
 
 ### 5. All Targets Schema (Google Sheets Input)
-Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
+Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`)
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
