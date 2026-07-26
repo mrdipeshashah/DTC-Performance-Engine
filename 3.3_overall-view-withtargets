@@ -1,0 +1,29 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_overall_performance_with_targets` AS
+WITH aggregated_ga AS (
+  SELECT
+    Date AS Month,
+    SUM(Sessions) AS Total_Sessions,
+    SUM(GA_Transactions) AS Total_Transactions,
+    SUM(GA_Revenue) AS Total_Revenue
+  FROM `mrdipeshashah.Forecasting.monthlygoogleanalytics`
+  GROUP BY 1
+)
+SELECT
+  COALESCE(ga.Month, at.Month) AS Month,
+
+  -- Actual Store Performance
+  COALESCE(ga.Total_Sessions, 0) AS Actual_Sessions,
+  COALESCE(ga.Total_Transactions, 0) AS Actual_Transactions,
+  COALESCE(ga.Total_Revenue, 0) AS Actual_Revenue,
+
+  -- Store-Wide Targets (from alltargets)
+  COALESCE(at.Spend_Target, 0) AS Target_Spend,
+  COALESCE(at.Conversions_Target, 0) AS Target_Conversions,
+  COALESCE(at.Revenue_Target, 0) AS Target_Revenue,
+  COALESCE(at.Total_Customers_Target, 0) AS Target_Total_Customers,
+  COALESCE(at.New_Customers_Target, 0) AS Target_New_Customers,
+  COALESCE(at.Profit_Target, 0) AS Target_Profit
+
+FROM aggregated_ga ga
+FULL OUTER JOIN `mrdipeshashah.Forecasting.alltargets` at
+  ON ga.Month = at.Month;
