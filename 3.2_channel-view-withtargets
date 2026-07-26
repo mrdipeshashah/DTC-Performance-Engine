@@ -1,11 +1,23 @@
 CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_channel_performance_with_targets` AS
-SELECT 
-  p.*,
-  t.Spend_Target AS spend_target,
-  t.Conversions_Target AS conversions_target,
-  t.Target_CPA AS target_cpa,
-  t.Revenue_Target AS revenue_target
-FROM `mrdipeshashah.Forecasting.rpt_channel_performance` p
-LEFT JOIN `mrdipeshashah.Forecasting.channelstarget` t
-  ON DATE_TRUNC(p.date, MONTH) = t.Month
- AND LOWER(TRIM(p.channel)) = LOWER(TRIM(t.Channel))
+SELECT
+  -- Primary Join Keys
+  COALESCE(ga.Date, ct.Month) AS Month,
+  COALESCE(ga.Channel, ct.Channel) AS Channel,
+
+  -- Actuals (from monthlygoogleanalytics)
+  COALESCE(ga.Sessions, 0) AS Actual_Sessions,
+  COALESCE(ga.GA_Transactions, 0) AS Actual_Transactions,
+  COALESCE(ga.GA_Revenue, 0) AS Actual_Revenue,
+
+  -- Channel Targets (from channelstarget)
+  COALESCE(ct.Spend_Target, 0) AS Target_Spend,
+  COALESCE(ct.Conversions_Target, 0) AS Target_Conversions,
+  COALESCE(ct.Revenue_Target, 0) AS Target_Revenue,
+  ct.Target_CPA,
+  ct.Campaign,
+  ct.Notes
+
+FROM `mrdipeshashah.Forecasting.monthlygoogleanalytics` ga
+FULL OUTER JOIN `mrdipeshashah.Forecasting.channelstarget` ct
+  ON ga.Date = ct.Month
+ AND ga.Channel = ct.Channel;
