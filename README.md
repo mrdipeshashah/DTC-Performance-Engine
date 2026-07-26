@@ -234,3 +234,207 @@ This repository contains the calculated field specifications for the BigQuery-ba
 | **Cost Per Session (CPS)** | `SUM(ad_spend) / SUM(sessions)` | Currency (£) | Ad cost to drive one session from channel |
 | **Channel AOV** | `SUM(ga_revenue) / SUM(ga_transactions)` | Currency (£) | Average order value by channel |
 
+# Looker Studio Calculated Metrics Documentation
+
+This document contains all the Looker Studio calculated fields created for the Looker Studio reporting dashboard, mapped directly to BigQuery view schemas for both **Channel Performance** and **Overall Performance** datasources.
+
+---
+
+## 1. Data Source: `rpt_channel_performance_with_targets` (Channel Performance View)
+
+This data source handles channel-level performance and pacing based on Google Analytics actuals and targets.
+
+### A. Core Efficiency & Static Delivery
+* **GA Conversion Rate (CVR)**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Transactions) / SUM(Actual_Sessions)
+    ```
+* **GA Average Order Value (AOV)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Actual_Revenue) / SUM(Actual_Transactions)
+    ```
+* **Channel Revenue Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Revenue) / SUM(Target_Revenue)
+    ```
+* **Channel Conversion Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Transactions) / SUM(Target_Conversions)
+    ```
+* **Channel Revenue Variance (£)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Actual_Revenue) - SUM(Target_Revenue)
+    ```
+* **Channel Conversion Variance (Orders)**
+  * **Type:** Number
+  * **Formula:**
+    ```text
+    SUM(Actual_Transactions) - SUM(Target_Conversions)
+    ```
+
+### B. Run-Rate & Projections (Pacing)
+* **Expected Channel Spend (To Date)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Target_Spend) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Expected Channel Revenue (To Date)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Target_Revenue) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Projected Channel Revenue (Month End)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    (SUM(Actual_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)
+    ```
+* **Projected Channel Revenue Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    ((SUM(Actual_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Revenue)
+    ```
+* **Expected Channel Conversions (To Date)**
+  * **Type:** Number
+  * **Formula:**
+    ```text
+    SUM(Target_Conversions) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Projected Channel Conversions (Month End)**
+  * **Type:** Number
+  * **Formula:**
+    ```text
+    (SUM(Actual_Transactions) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)
+    ```
+* **Projected Channel Conversions Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    ((SUM(Actual_Transactions) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Conversions)
+    ```
+
+---
+
+## 2. Data Source: `rpt_overall_performance_with_targets` (Overall Storewide View)
+
+This data source handles overall store performance, executive scorecards, profit tracking, and customer acquisition metrics using Shopify and overall targets.
+
+### A. Static Delivery & Ratios
+* **Overall Revenue MTD Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Shopify_Revenue) / SUM(Target_Revenue)
+    ```
+* **Overall Orders MTD Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Shopify_Orders) / SUM(Target_Conversions)
+    ```
+* **Overall Profit MTD Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Profit) / SUM(Target_Profit)
+    ```
+* **Profit Variance (£)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Actual_Profit) - SUM(Target_Profit)
+    ```
+* **New Customer Acquisition Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_New_Customers) / SUM(Target_New_Customers)
+    ```
+* **Total Customer Acquisition Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_Total_Customers) / SUM(Target_Total_Customers)
+    ```
+* **New vs Total Customer Ratio %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    SUM(Actual_New_Customers) / SUM(Actual_Total_Customers)
+    ```
+
+### B. Run-Rate & Projections (Pacing)
+* **Expected Spend (To Date)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Target_Spend) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Expected Revenue (To Date)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Target_Revenue) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Projected Total Revenue (Month End)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    (SUM(Actual_Shopify_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)
+    ```
+* **Projected Total Revenue Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    ((SUM(Actual_Shopify_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Revenue)
+    ```
+* **Expected Total Profit (To Date)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    SUM(Target_Profit) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Projected Total Profit (Month End)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    (SUM(Actual_Profit) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)
+    ```
+* **Projected Profit Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    ((SUM(Actual_Profit) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Profit)
+    ```
+* **Expected Total Orders (To Date)**
+  * **Type:** Number
+  * **Formula:**
+    ```text
+    SUM(Target_Conversions) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
+    ```
+* **Projected Total Orders (Month End)**
+  * **Type:** Number
+  * **Formula:**
+    ```text
+    (SUM(Actual_Shopify_Orders) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)
+    ```
+* **Projected Orders Delivery %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    ((SUM(Actual_Shopify_Orders) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Conversions)
+    ```
+
