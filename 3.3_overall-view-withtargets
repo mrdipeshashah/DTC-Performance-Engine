@@ -11,6 +11,10 @@ WITH aggregated_ga AS (
 SELECT
   COALESCE(s.Month, ga.Month, t.Month) AS Month,
 
+  -- Live Date Pacing Helpers (For Looker Studio Run-Rate)
+  EXTRACT(DAY FROM CURRENT_DATE()) AS current_day_of_month,
+  EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS days_in_current_month,
+
   -- Shopify Actuals
   COALESCE(s.Shopify_Orders, 0) AS Actual_Shopify_Orders,
   COALESCE(s.Shopify_Revenue, 0) AS Actual_Shopify_Revenue,
@@ -23,7 +27,7 @@ SELECT
   COALESCE(ga.Total_GA_Transactions, 0) AS Actual_GA_Transactions,
   COALESCE(ga.Total_GA_Revenue, 0) AS Actual_GA_Revenue,
 
-  -- Store-Wide Targets (from alltargets)
+  -- Store Targets
   COALESCE(t.Spend_Target, 0) AS Target_Spend,
   COALESCE(t.Conversions_Target, 0) AS Target_Conversions,
   COALESCE(t.Revenue_Target, 0) AS Target_Revenue,
@@ -31,7 +35,7 @@ SELECT
   COALESCE(t.New_Customers_Target, 0) AS Target_New_Customers,
   COALESCE(t.Profit_Target, 0) AS Target_Profit,
 
-  -- Executive Pacing Calculations
+  -- Static Delivery % Calculations
   SAFE_DIVIDE(s.Shopify_Revenue, t.Revenue_Target) AS Overall_Revenue_Delivery_Pct,
   SAFE_DIVIDE(s.Shopify_Orders, t.Conversions_Target) AS Overall_Order_Delivery_Pct,
   SAFE_DIVIDE(s.Profit, t.Profit_Target) AS Overall_Profit_Delivery_Pct
@@ -39,5 +43,5 @@ SELECT
 FROM `mrdipeshashah.Forecasting.stg_monthlyshopify` s
 FULL OUTER JOIN aggregated_ga ga
   ON s.Month = ga.Month
-FULL OUTER JOIN `mrdipeshashah.Forecasting.alltargets` t
+FULL OUTER JOIN `mrdipeshashah.Forecasting.stg_alltargets` t
   ON COALESCE(s.Month, ga.Month) = t.Month;
