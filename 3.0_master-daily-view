@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_daily_performance` AS
 WITH dates AS (
   SELECT DISTINCT date FROM `mrdipeshashah.Forecasting.stg_shopify`
 ),
@@ -58,4 +57,4 @@ FROM dates d
 LEFT JOIN `mrdipeshashah.Forecasting.stg_shopify` s ON d.date = s.date
 LEFT JOIN paid_daily p ON d.date = p.date
 LEFT JOIN ga_daily g ON d.date = g.date
-LEFT JOIN `mrdipeshashah.Forecasting.stg_alltargets` t ON DATE_TRUNC(d.date, MONTH) = t.target_month;
+LEFT JOIN `mrdipeshashah.Forecasting.stg_alltargets` t ON DATE_TRUNC(d.date, MONTH) = t.month;
