@@ -1,0 +1,13 @@
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_monthlyshopify` AS
+SELECT
+  -- Formats Date to strict DATE type
+  CAST(Date AS DATE) AS Month,
+  
+  -- Integer & Numeric measures
+  CAST(Shopify_Orders AS INT64) AS Shopify_Orders,
+  CAST(Shopify_Revenue AS NUMERIC) AS Shopify_Revenue,
+  CAST(Total_Customers AS INT64) AS Total_Customers,
+  CAST(New_Customers AS INT64) AS New_Customers,
+  CAST(Profit AS NUMERIC) AS Profit
+
+FROM `mrdipeshashah.Forecasting.monthlyshopify`;
