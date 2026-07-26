@@ -1,29 +1,43 @@
 CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_overall_performance_with_targets` AS
 WITH aggregated_ga AS (
   SELECT
-    Date AS Month,
-    SUM(Sessions) AS Total_Sessions,
-    SUM(GA_Transactions) AS Total_Transactions,
-    SUM(GA_Revenue) AS Total_Revenue
-  FROM `mrdipeshashah.Forecasting.monthlygoogleanalytics`
+    Month,
+    SUM(Sessions) AS Total_GA_Sessions,
+    SUM(GA_Transactions) AS Total_GA_Transactions,
+    SUM(GA_Revenue) AS Total_GA_Revenue
+  FROM `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics`
   GROUP BY 1
 )
 SELECT
-  COALESCE(ga.Month, at.Month) AS Month,
+  COALESCE(s.Month, ga.Month, t.Month) AS Month,
 
-  -- Actual Store Performance
-  COALESCE(ga.Total_Sessions, 0) AS Actual_Sessions,
-  COALESCE(ga.Total_Transactions, 0) AS Actual_Transactions,
-  COALESCE(ga.Total_Revenue, 0) AS Actual_Revenue,
+  -- Shopify Actuals
+  COALESCE(s.Shopify_Orders, 0) AS Actual_Shopify_Orders,
+  COALESCE(s.Shopify_Revenue, 0) AS Actual_Shopify_Revenue,
+  COALESCE(s.Total_Customers, 0) AS Actual_Total_Customers,
+  COALESCE(s.New_Customers, 0) AS Actual_New_Customers,
+  COALESCE(s.Profit, 0) AS Actual_Profit,
+
+  -- GA Actuals
+  COALESCE(ga.Total_GA_Sessions, 0) AS Actual_GA_Sessions,
+  COALESCE(ga.Total_GA_Transactions, 0) AS Actual_GA_Transactions,
+  COALESCE(ga.Total_GA_Revenue, 0) AS Actual_GA_Revenue,
 
   -- Store-Wide Targets (from alltargets)
-  COALESCE(at.Spend_Target, 0) AS Target_Spend,
-  COALESCE(at.Conversions_Target, 0) AS Target_Conversions,
-  COALESCE(at.Revenue_Target, 0) AS Target_Revenue,
-  COALESCE(at.Total_Customers_Target, 0) AS Target_Total_Customers,
-  COALESCE(at.New_Customers_Target, 0) AS Target_New_Customers,
-  COALESCE(at.Profit_Target, 0) AS Target_Profit
+  COALESCE(t.Spend_Target, 0) AS Target_Spend,
+  COALESCE(t.Conversions_Target, 0) AS Target_Conversions,
+  COALESCE(t.Revenue_Target, 0) AS Target_Revenue,
+  COALESCE(t.Total_Customers_Target, 0) AS Target_Total_Customers,
+  COALESCE(t.New_Customers_Target, 0) AS Target_New_Customers,
+  COALESCE(t.Profit_Target, 0) AS Target_Profit,
 
-FROM aggregated_ga ga
-FULL OUTER JOIN `mrdipeshashah.Forecasting.alltargets` at
-  ON ga.Month = at.Month;
+  -- Executive Pacing Calculations
+  SAFE_DIVIDE(s.Shopify_Revenue, t.Revenue_Target) AS Overall_Revenue_Delivery_Pct,
+  SAFE_DIVIDE(s.Shopify_Orders, t.Conversions_Target) AS Overall_Order_Delivery_Pct,
+  SAFE_DIVIDE(s.Profit, t.Profit_Target) AS Overall_Profit_Delivery_Pct
+
+FROM `mrdipeshashah.Forecasting.stg_monthlyshopify` s
+FULL OUTER JOIN aggregated_ga ga
+  ON s.Month = ga.Month
+FULL OUTER JOIN `mrdipeshashah.Forecasting.alltargets` t
+  ON COALESCE(s.Month, ga.Month) = t.Month;
