@@ -383,6 +383,18 @@ This data source handles overall store performance, executive scorecards, profit
     ```text
     SUM(Target_Spend) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))
     ```
+* **Projected Total Spend (Month End)**
+  * **Type:** Currency (GBP)
+  * **Formula:**
+    ```text
+    (SUM(Actual_Spend) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)
+    ```
+* **Projected Spend Pacing %**
+  * **Type:** Percent
+  * **Formula:**
+    ```text
+    ((SUM(Actual_Spend) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Spend)
+    ```
 * **Expected Revenue (To Date)**
   * **Type:** Currency (GBP)
   * **Formula:**
@@ -437,4 +449,3 @@ This data source handles overall store performance, executive scorecards, profit
     ```text
     ((SUM(Actual_Shopify_Orders) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Conversions)
     ```
-
