@@ -238,10 +238,6 @@ This repository contains the calculated field specifications for the BigQuery-ba
 | **Cost Per Session (CPS)** | `SUM(ad_spend) / SUM(sessions)` | Currency (£) | Ad cost to drive one session from channel |
 | **Channel AOV** | `SUM(ga_revenue) / SUM(ga_transactions)` | Currency (£) | Average order value by channel |
 
-# Looker Studio Calculated Metrics Documentation
-
-This document contains all the Looker Studio calculated fields created for the Looker Studio reporting dashboard, mapped directly to BigQuery view schemas for both **Channel Performance** and **Overall Performance** datasources.
-
 ---
 
 ## 1. Data Source: `rpt_channel_performance_with_targets` (Channel Performance View)
