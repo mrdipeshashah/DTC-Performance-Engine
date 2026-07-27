@@ -1,13 +1,22 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_channel_performance_with_targets` AS
+WITH pm_monthly AS (
+  SELECT
+    DATE_TRUNC(Date, MONTH) AS Month,
+    Channel,
+    SUM(Cost) AS Actual_Spend
+  FROM `mrdipeshashah.Forecasting.stg_paidmedia`
+  GROUP BY 1, 2
+)
+
 SELECT
   -- Primary Keys
-  COALESCE(ga.Month, ct.Month) AS Month,
-  COALESCE(ga.Channel, ct.Channel) AS Channel,
+  COALESCE(ga.Month, ct.Month, pm.Month) AS Month,
+  COALESCE(ga.Channel, ct.Channel, pm.Channel) AS Channel,
 
-  -- Actuals (GA)
+  -- Actuals (GA + Paid Media Spend)
   COALESCE(ga.Sessions, 0) AS Actual_Sessions,
   COALESCE(ga.GA_Transactions, 0) AS Actual_Transactions,
   COALESCE(ga.GA_Revenue, 0) AS Actual_Revenue,
+  COALESCE(pm.Actual_Spend, 0) AS Actual_Spend,
 
   -- Targets (Channel Targets)
   COALESCE(ct.Spend_Target, 0) AS Target_Spend,
@@ -25,6 +34,12 @@ SELECT
   (COALESCE(ga.GA_Revenue, 0) - COALESCE(ct.Revenue_Target, 0)) AS Revenue_Variance
 
 FROM `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics` ga
+
 FULL OUTER JOIN `mrdipeshashah.Forecasting.channelstarget` ct
   ON ga.Month = ct.Month
- AND ga.Channel = ct.Channel;
+ AND ga.Channel = ct.Channel
+
+-- Join Aggregated Monthly Paid Media
+FULL OUTER JOIN pm_monthly pm
+  ON COALESCE(ga.Month, ct.Month) = pm.Month
+ AND COALESCE(ga.Channel, ct.Channel) = pm.Channel
