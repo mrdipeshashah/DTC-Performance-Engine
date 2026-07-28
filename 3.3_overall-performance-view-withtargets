@@ -50,7 +50,24 @@ SELECT
   -- Static Delivery % Calculations
   SAFE_DIVIDE(s.Shopify_Revenue, t.Revenue_Target) AS Overall_Revenue_Delivery_Pct,
   SAFE_DIVIDE(s.Shopify_Orders, t.Conversions_Target) AS Overall_Order_Delivery_Pct,
-  SAFE_DIVIDE(s.Profit, t.Profit_Target) AS Overall_Profit_Delivery_Pct
+  SAFE_DIVIDE(s.Profit, t.Profit_Target) AS Overall_Profit_Delivery_Pct,
+  -- MoM Variance Calculations (Previous Month Comparisons)
+  LAG(s.Shopify_Revenue) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)) AS Last_Month_Revenue,
+  s.Shopify_Revenue - LAG(s.Shopify_Revenue) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)) AS Diff_MoM_Revenue,
+  SAFE_DIVIDE(
+    s.Shopify_Revenue - LAG(s.Shopify_Revenue) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)),
+    LAG(s.Shopify_Revenue) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month))
+  ) AS Diff_MoM_Revenue_Pct,
+
+  LAG(pm.Actual_Spend) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)) AS Last_Month_Spend,
+  pm.Actual_Spend - LAG(pm.Actual_Spend) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)) AS Diff_MoM_Spend,
+  SAFE_DIVIDE(
+    pm.Actual_Spend - LAG(pm.Actual_Spend) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)),
+    LAG(pm.Actual_Spend) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month))
+  ) AS Diff_MoM_Spend_Pct,
+
+  LAG(s.New_Customers) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)) AS Last_Month_New_Customers,
+  s.New_Customers - LAG(s.New_Customers) OVER (ORDER BY COALESCE(s.Month, ga.Month, pm.Month, t.Month)) AS Diff_MoM_New_Customers
 
 FROM `mrdipeshashah.Forecasting.stg_monthlyshopify` s
 FULL OUTER JOIN aggregated_ga ga
