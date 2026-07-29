@@ -15,6 +15,26 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | **`3.2_channel-performance-view-withtargets`** | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
 | **`3.3_overall-performance-view-withtargets`** | `2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 
+## Reporting Views & Lineage Matrix
+
+### Final Reporting Views (Looker Studio Core)
+
+| Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
+| :--- | :--- |
+| `3.0_master-daily-view` | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
+| `3.1_channel-view` | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
+| `3.2_channel-performance-view-withtargets` | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
+| `3.3_overall-performance-view-withtargets` | `2.2_stg-shopify-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
+
+---
+
+### Key Data Health & Reconciliation Views (Frequent Audit Tools)
+
+| Utility / Audit View (`1.x` / `2.x`) | Purpose | Upstream Dependencies |
+| :--- | :--- | :--- |
+| `1.4_mtd-keymetrics-tracker` | Dynamic Month-to-Date key metrics tracker up to yesterday | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
+| `2.7_stg-daily_v_monthly` | Closed-month data integrity & variance checker (Daily vs. Monthly rollups) | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly` |
+
 ## 📊 Data Requirements & Schema
 
 The system unifies three distinct data requirements into a single analytical view.
