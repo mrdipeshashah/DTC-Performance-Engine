@@ -1,6 +1,8 @@
-# 🚀 DTC Commercial Operations & Customer Acquisition Pipeline
+# 🚀 DTC Commercial Operations & Customer Acquisition 
 
-An enterprise-grade data warehouse architecture built on **Google BigQuery** and **Looker Studio**. This system automatically ingests cross-channel ad spend, web analytics delivery, and human-defined targets to deliver real-time budget and conversion run-rate pacing alerts.
+Built an end-to-end solution using **Google BigQuery**, **GoogleSheets** and **Data Studio** that collates data from ad-platforms, google analytics, and defined targets to deliver daily budget, conversion run-rate and pacing insights. 
+
+https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
 
 ---
 
