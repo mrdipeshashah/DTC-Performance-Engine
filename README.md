@@ -149,6 +149,8 @@ This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and
 
 #### Profit & Pacing SQL Logic
 
+#### Profit & Pacing SQL Logic
+
 ```sql
 -- Daily Target Run-Rate (Overall Profit Target / Days in Month)
 COALESCE(t.Profit_Target, 0) / EXTRACT(DAY FROM LAST_DAY(r.date)) AS daily_profit_target,
@@ -157,7 +159,8 @@ COALESCE(t.Profit_Target, 0) / EXTRACT(DAY FROM LAST_DAY(r.date)) AS daily_profi
 SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 
 -- Projected Month-End Profit Variance (£)
-((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM CURRENT_DATE())) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
+((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
+```
 
 ## 📊 Looker Studio Calculated Fields Documentation
 
@@ -235,25 +238,25 @@ This section documents the calculated field specifications for the BigQuery-back
 #### B. Run-Rate & Projections (Pacing)
 * **Expected Channel Spend (To Date)**
   * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Spend) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Spend) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))`
 * **Expected Channel Revenue (To Date)**
   * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Revenue) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Revenue) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))`
 * **Projected Channel Revenue (Month End)**
   * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)`
+  * **Formula:** `(SUM(Actual_Revenue) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)`
 * **Projected Channel Revenue Delivery %**
   * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Revenue)`
+  * **Formula:** `((SUM(Actual_Revenue) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Revenue)`
 * **Expected Channel Conversions (To Date)**
   * **Type:** Number
-  * **Formula:** `SUM(Target_Conversions) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Conversions) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))`
 * **Projected Channel Conversions (Month End)**
   * **Type:** Number
-  * **Formula:** `(SUM(Actual_Transactions) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)`
+  * **Formula:** `(SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)`
 * **Projected Channel Conversions Delivery %**
   * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Transactions) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Conversions)`
+  * **Formula:** `((SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Conversions)`
 
 ---
 
@@ -262,37 +265,37 @@ This section documents the calculated field specifications for the BigQuery-back
 #### Overall Run-Rate & Projections (Pacing)
 * **Expected Spend (To Date)**
   * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Spend) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Spend) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
 * **Projected Total Spend (Month End)**
   * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Spend) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)`
+  * **Formula:** `(SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
 * **Projected Spend Pacing %**
   * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Spend) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Spend)`
+  * **Formula:** `((SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Spend)`
 * **Expected Revenue (To Date)**
   * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Revenue) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Revenue) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
 * **Projected Total Revenue (Month End)**
   * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Shopify_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)`
+  * **Formula:** `(SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
 * **Projected Total Revenue Delivery %**
   * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Shopify_Revenue) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Revenue)`
+  * **Formula:** `((SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Revenue)`
 * **Expected Total Profit (To Date)**
   * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Profit) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Profit) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
 * **Projected Total Profit (Month End)**
   * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Profit) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)`
+  * **Formula:** `(SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
 * **Projected Profit Delivery %**
   * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Profit) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Profit)`
+  * **Formula:** `((SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Profit)`
 * **Expected Total Orders (To Date)**
   * **Type:** Number
-  * **Formula:** `SUM(Target_Conversions) * (EXTRACT(DAY FROM TODAY()) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY))`
+  * **Formula:** `SUM(Target_Conversions) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
 * **Projected Total Orders (Month End)**
   * **Type:** Number
-  * **Formula:** `(SUM(Actual_Shopify_Orders) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)`
+  * **Formula:** `(SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
 * **Projected Orders Delivery %**
   * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Shopify_Orders) / EXTRACT(DAY FROM TODAY())) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(TODAY(), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(TODAY(), MONTH), DAY)) / SUM(Target_Conversions)`
+  * **Formula:** `((SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Conversions)`
