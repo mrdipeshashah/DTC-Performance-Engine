@@ -6,30 +6,16 @@ An enterprise-grade data warehouse architecture built on **Google BigQuery** and
 
 ## 🏗️ Architecture Overview
 
-```mermaid
-flowchart TD
-    subgraph Inputs ["1. Data Inputs"]
-        GS["📄 Google Sheets<br/><i>(Marketing_Targets_Master)</i>"]
-        FIO["🔌 Funnel.io<br/><i>(Paid Media APIs)</i>"]
-        GA4["📈 GA4 Export<br/><i>(Web Delivery Stream)</i>"]
-    end
+## 🏗️ Data Architecture & Lineage
 
-    subgraph DataWarehouse ["2. BigQuery Data Warehouse"]
-        BQ[("Google BigQuery")]
-        SQLView["⚡ Unified Pacing View<br/><i>(SQL FULL OUTER JOIN)</i>"]
-    end
+The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
 
-    subgraph Visualization ["3. Reporting & BI"]
-        LS["📊 Pacing Dashboard<br/><i>(Looker Studio / BI)</i>"]
-    end
-
-    GS -->|BigQuery Sheet Link| BQ
-    FIO -->|Automated API Pipeline| BQ
-    GA4 -->|Daily Streaming Export| BQ
-
-    BQ --> SQLView
-    SQLView --> LS
-```
+| Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
+| :--- | :--- |
+| **`3.0_master-daily-view`** | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
+| **`3.1_channel-view`** | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
+| **`3.2_channel-performance-view-withtargets`** | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
+| **`3.3_overall-performance-view-withtargets`** | `2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 
 ## 📊 Data Requirements & Schema
 
