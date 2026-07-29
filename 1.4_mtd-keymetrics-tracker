@@ -1,0 +1,80 @@
+WITH current_month_range AS (
+  SELECT 
+    DATE_TRUNC(CURRENT_DATE(), MONTH) AS start_of_month,
+    CURRENT_DATE() AS today
+),
+
+-- 1. GA4 MTD Aggregation
+ga_mtd AS (
+  SELECT 
+    DATE_TRUNC(Date, MONTH) AS month_start,
+    SUM(Sessions) AS mtd_ga_sessions,
+    SUM(GA_Transactions) AS mtd_ga_transactions,
+    SUM(GA_Revenue) AS mtd_ga_revenue
+  FROM `mrdipeshashah.Forecasting.googleanalytics`
+  WHERE Date >= (SELECT start_of_month FROM current_month_range)
+    AND Date < (SELECT today FROM current_month_range)
+  GROUP BY 1
+),
+
+-- 2. Paid Media MTD Aggregation
+paid_mtd AS (
+  SELECT 
+    DATE_TRUNC(Date, MONTH) AS month_start,
+    SUM(Cost) AS mtd_ad_spend,
+    SUM(Impressions) AS mtd_impressions,
+    SUM(Clicks) AS mtd_clicks
+  FROM `mrdipeshashah.Forecasting.paidmedia`
+  WHERE Date >= (SELECT start_of_month FROM current_month_range)
+    AND Date < (SELECT today FROM current_month_range)
+  GROUP BY 1
+),
+
+-- 3. Daily Shopify MTD Aggregation
+shopify_mtd AS (
+  SELECT 
+    DATE_TRUNC(Date, MONTH) AS month_start, -- Change 'Date' to 'date' or 'created_at' if needed
+    SUM(Shopify_Orders) AS mtd_shopify_orders,
+    SUM(Shopify_Revenue) AS mtd_shopify_revenue,
+    SUM(Total_Customers) AS mtd_total_customers,
+    SUM(New_Customers) AS mtd_new_customers,
+    SUM(Profit) AS mtd_shopify_profit
+  FROM `mrdipeshashah.Forecasting.shopify`
+  WHERE Date >= (SELECT start_of_month FROM current_month_range)
+    AND Date < (SELECT today FROM current_month_range)
+  GROUP BY 1
+)
+
+-- 4. Reconcile Metrics
+SELECT
+  s.month_start,
+
+  -- Shopify Totals
+  s.mtd_shopify_orders,
+  s.mtd_shopify_revenue,
+  s.mtd_shopify_profit,
+
+  -- GA4 Totals
+  g.mtd_ga_sessions,
+  g.mtd_ga_transactions,
+  g.mtd_ga_revenue,
+
+  -- Paid Media Totals
+  p.mtd_ad_spend,
+  p.mtd_clicks,
+  p.mtd_impressions,
+
+  -- Coverage & Health Checks
+  SAFE_DIVIDE(g.mtd_ga_transactions, s.mtd_shopify_orders) AS ga4_order_tracking_coverage_pct,
+  SAFE_DIVIDE(g.mtd_ga_revenue, s.mtd_shopify_revenue) AS ga4_revenue_tracking_coverage_pct,
+
+  -- Blended Metrics
+  SAFE_DIVIDE(s.mtd_shopify_profit, p.mtd_ad_spend) AS blended_poas,
+  SAFE_DIVIDE(s.mtd_shopify_revenue, p.mtd_ad_spend) AS blended_roas,
+  SAFE_DIVIDE(p.mtd_ad_spend, s.mtd_shopify_orders) AS blended_cpa,
+  SAFE_DIVIDE(p.mtd_ad_spend, s.mtd_new_customers) AS blended_cac,
+  SAFE_DIVIDE(s.mtd_shopify_revenue, s.mtd_shopify_orders) AS shopify_aov
+
+FROM shopify_mtd s
+LEFT JOIN ga_mtd g ON s.month_start = g.month_start
+LEFT JOIN paid_mtd p ON s.month_start = p.month_start;
