@@ -149,8 +149,6 @@ This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and
 
 #### Profit & Pacing SQL Logic
 
-#### Profit & Pacing SQL Logic
-
 ```sql
 -- Daily Target Run-Rate (Overall Profit Target / Days in Month)
 COALESCE(t.Profit_Target, 0) / EXTRACT(DAY FROM LAST_DAY(r.date)) AS daily_profit_target,
