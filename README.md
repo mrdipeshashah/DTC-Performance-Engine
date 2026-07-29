@@ -8,13 +8,6 @@ https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
 
 The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
 
-| Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
-| :--- | :--- |
-| **`3.0_master-daily-view`** | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
-| **`3.1_channel-view`** | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
-| **`3.2_channel-performance-view-withtargets`** | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
-| **`3.3_overall-performance-view-withtargets`** | `2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
-
 ## Reporting Views & Lineage Matrix
 
 ### Final Reporting Views (Looker Studio Core)
@@ -25,8 +18,6 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | `3.1_channel-view` | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
 | `3.2_channel-performance-view-withtargets` | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
 | `3.3_overall-performance-view-withtargets` | `2.2_stg-shopify-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
-
----
 
 ### Key Data Health & Reconciliation Views (Frequent Audit Tools)
 
