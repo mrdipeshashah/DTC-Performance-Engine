@@ -4,8 +4,6 @@ Built an end-to-end solution using **Google BigQuery**, **GoogleSheets** and **D
 
 https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
 
----
-
 ## 🏗️ Architecture Overview
 
 The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
@@ -16,8 +14,6 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | **`3.1_channel-view`** | `2.0_stg-paidmedia`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
 | **`3.2_channel-performance-view-withtargets`** | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
 | **`3.3_overall-performance-view-withtargets`** | `2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
-
----
 
 ## 📊 Data Requirements & Schema
 
@@ -89,13 +85,9 @@ Human-managed storewide target benchmarks maintained in Google Sheets (`Marketin
 | `New_Customers_Target` | `INTEGER` | Target new customer volume |
 | `Profit Target` | `NUMERIC` | Target gross profit (£) |
 
----
-
 ## 📖 Master Data Dictionary & Field Mapping Reference
 
 This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and defines standardized calculation logic for downstream SQL modeling and Looker Studio reporting.
-
----
 
 ### 📑 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
 
@@ -134,8 +126,6 @@ This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and
 | | New_Customers_Target | `New_Customers_Target` | `INTEGER` | New buyer target |
 | | **Profit_Target** | **`Profit_Target`** | **`NUMERIC`** | **Store Gross Profit Target** |
 
----
-
 ### 🧮 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
 
 #### Core Blended Metrics
@@ -144,8 +134,6 @@ This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and
 * **Gross Profit Margin %:** `Shopify Profit / Shopify Revenue`
 * **Blended CPA:** `Paid Media Cost / Shopify Orders`
 * **Blended CAC (New Customers):** `Paid Media Cost / New Customers`
-
----
 
 #### Profit & Pacing SQL Logic
 
@@ -163,8 +151,6 @@ SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 ## 📊 Looker Studio Calculated Fields Documentation
 
 This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
-
----
 
 ### Data Source 1: `3.3_overall-performance-view-withtargets`
 *Primary dataset for executive summary, overall store health, profitability, customer acquisition, and storewide target pacing.*
@@ -207,8 +193,6 @@ This section documents the calculated field specifications for the BigQuery-back
 | **Returning Customer Volume** | `SUM(total_customers) - SUM(new_customers)` | Integer | Volume of returning customers |
 | **Ecommerce CVR (GA4 %)** | `SUM(ga_transactions) / SUM(sessions)` | Percent | Conversion rate according to GA4 |
 | **GA4 Tracking Coverage Ratio %** | `SUM(ga_transactions) / SUM(shopify_orders)` | Percent | GA4 transaction capture rate vs. Shopify |
-
----
 
 ### Data Source 2: `3.2_channel-performance-view-withtargets`
 *Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics.*
@@ -255,8 +239,6 @@ This section documents the calculated field specifications for the BigQuery-back
 * **Projected Channel Conversions Delivery %**
   * **Type:** Percent
   * **Formula:** `((SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Conversions)`
-
----
 
 ### Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
 
