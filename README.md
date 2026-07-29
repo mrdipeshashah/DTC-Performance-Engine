@@ -6,8 +6,6 @@ An enterprise-grade data warehouse architecture built on **Google BigQuery** and
 
 ## 🏗️ Architecture Overview
 
-## 🏗️ Data Architecture & Lineage
-
 The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
 
 | Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
