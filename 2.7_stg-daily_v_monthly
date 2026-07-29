@@ -1,0 +1,90 @@
+WITH daily_shopify AS (
+  SELECT 
+    DATE_TRUNC(`date`, MONTH) AS Month,
+    SUM(shopify_revenue) AS daily_shopify_revenue,
+    SUM(shopify_orders) AS daily_shopify_orders,
+    SUM(total_customers) AS daily_total_customers,
+    SUM(new_customers) AS daily_new_customers,
+    SUM(profit) AS daily_profit
+  FROM `mrdipeshashah.Forecasting.stg_shopify`
+  GROUP BY 1
+),
+
+daily_ga AS (
+  SELECT 
+    DATE_TRUNC(`date`, MONTH) AS Month,
+    SUM(sessions) AS daily_ga_sessions,
+    SUM(ga_transactions) AS daily_ga_transactions,
+    SUM(ga_revenue) AS daily_ga_revenue
+  FROM `mrdipeshashah.Forecasting.stg_googleanalytics`
+  GROUP BY 1
+),
+
+monthly_ga_agg AS (
+  SELECT 
+    Month,
+    SUM(Sessions) AS monthly_ga_sessions,
+    SUM(GA_Transactions) AS monthly_ga_transactions,
+    SUM(GA_Revenue) AS monthly_ga_revenue
+  FROM `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics`
+  GROUP BY 1
+)
+
+SELECT 
+  COALESCE(ds.Month, ms.Month, dg.Month, mg.Month) AS Month,
+
+  ------------------------------------------------------------------
+  -- SHOPIFY METRICS & VARIANCES
+  ------------------------------------------------------------------
+  -- Revenue
+  COALESCE(ds.daily_shopify_revenue, 0) AS daily_shopify_revenue,
+  COALESCE(ms.Shopify_Revenue, 0) AS monthly_shopify_revenue,
+  ROUND(COALESCE(ds.daily_shopify_revenue, 0) - COALESCE(ms.Shopify_Revenue, 0), 2) AS shopify_revenue_variance,
+
+  -- Orders
+  COALESCE(ds.daily_shopify_orders, 0) AS daily_shopify_orders,
+  COALESCE(ms.Shopify_Orders, 0) AS monthly_shopify_orders,
+  (COALESCE(ds.daily_shopify_orders, 0) - COALESCE(ms.Shopify_Orders, 0)) AS shopify_orders_variance,
+
+  -- Total Customers
+  COALESCE(ds.daily_total_customers, 0) AS daily_total_customers,
+  COALESCE(ms.Total_Customers, 0) AS monthly_total_customers,
+  (COALESCE(ds.daily_total_customers, 0) - COALESCE(ms.Total_Customers, 0)) AS total_customers_variance,
+
+  -- New Customers
+  COALESCE(ds.daily_new_customers, 0) AS daily_new_customers,
+  COALESCE(ms.New_Customers, 0) AS monthly_new_customers,
+  (COALESCE(ds.daily_new_customers, 0) - COALESCE(ms.New_Customers, 0)) AS new_customers_variance,
+
+  -- Profit
+  COALESCE(ds.daily_profit, 0) AS daily_profit,
+  COALESCE(ms.Profit, 0) AS monthly_profit,
+  ROUND(COALESCE(ds.daily_profit, 0) - COALESCE(ms.Profit, 0), 2) AS profit_variance,
+
+  ------------------------------------------------------------------
+  -- GOOGLE ANALYTICS METRICS & VARIANCES
+  ------------------------------------------------------------------
+  -- Sessions
+  COALESCE(dg.daily_ga_sessions, 0) AS daily_ga_sessions,
+  COALESCE(mg.monthly_ga_sessions, 0) AS monthly_ga_sessions,
+  (COALESCE(dg.daily_ga_sessions, 0) - COALESCE(mg.monthly_ga_sessions, 0)) AS ga_sessions_variance,
+
+  -- Transactions
+  COALESCE(dg.daily_ga_transactions, 0) AS daily_ga_transactions,
+  COALESCE(mg.monthly_ga_transactions, 0) AS monthly_ga_transactions,
+  (COALESCE(dg.daily_ga_transactions, 0) - COALESCE(mg.monthly_ga_transactions, 0)) AS ga_transactions_variance,
+
+  -- GA Revenue
+  COALESCE(dg.daily_ga_revenue, 0) AS daily_ga_revenue,
+  COALESCE(mg.monthly_ga_revenue, 0) AS monthly_ga_revenue,
+  ROUND(COALESCE(dg.daily_ga_revenue, 0) - COALESCE(mg.monthly_ga_revenue, 0), 2) AS ga_revenue_variance
+
+FROM daily_shopify ds
+FULL OUTER JOIN `mrdipeshashah.Forecasting.stg_monthlyshopify` ms
+  ON ds.Month = ms.Month
+FULL OUTER JOIN daily_ga dg
+  ON COALESCE(ds.Month, ms.Month) = dg.Month
+FULL OUTER JOIN monthly_ga_agg mg
+  ON COALESCE(ds.Month, ms.Month, dg.Month) = mg.Month
+WHERE COALESCE(ds.Month, ms.Month, dg.Month, mg.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH)
+ORDER BY Month DESC;
