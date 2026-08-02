@@ -1,9 +1,24 @@
-WITH pm_monthly AS (
+-- 1. Daily MTD Paid Media Spend per Channel
+WITH pm_daily AS (
   SELECT
-    DATE_TRUNC(Date, MONTH) AS Month,
+    DATE_TRUNC(`date`, MONTH) AS Month,
     Channel,
-    SUM(Cost) AS Actual_Spend
-  FROM `mrdipeshashah.Forecasting.stg_paidmedia`
+    SUM(cost) AS Actual_Spend
+  FROM `mrdipeshashah.Forecasting.paidmedia`
+  WHERE `date` < CURRENT_DATE()
+  GROUP BY 1, 2
+),
+
+-- 2. Daily MTD GA4 Revenue & Transactions per Channel
+ga_daily AS (
+  SELECT
+    DATE_TRUNC(`Date`, MONTH) AS Month,
+    Channel,
+    SUM(GA_Revenue) AS GA_Revenue,
+    SUM(GA_Transactions) AS GA_Transactions,
+    SUM(Sessions) AS Sessions
+  FROM `mrdipeshashah.Forecasting.googleanalytics`
+  WHERE `Date` < CURRENT_DATE()
   GROUP BY 1, 2
 )
 
@@ -26,20 +41,26 @@ SELECT
   ct.Campaign,
   ct.Notes,
 
-  -- Performance Calculations
+  -- Performance Calculations (Preserved)
   SAFE_DIVIDE(ga.GA_Transactions, ga.Sessions) AS Actual_CVR,
   SAFE_DIVIDE(ga.GA_Revenue, ga.GA_Transactions) AS Actual_AOV,
   SAFE_DIVIDE(ga.GA_Revenue, ct.Revenue_Target) AS Revenue_Delivery_Pct,
   SAFE_DIVIDE(ga.GA_Transactions, ct.Conversions_Target) AS Conversion_Delivery_Pct,
-  (COALESCE(ga.GA_Revenue, 0) - COALESCE(ct.Revenue_Target, 0)) AS Revenue_Variance
+  (COALESCE(ga.GA_Revenue, 0) - COALESCE(ct.Revenue_Target, 0)) AS Revenue_Variance,
 
-FROM `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics` ga
+  -- Projected Channel Run-Rates (Safe for Day 1)
+  SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Channel_Revenue,
+
+  SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Channel_Spend
+
+FROM ga_daily ga
 
 FULL OUTER JOIN `mrdipeshashah.Forecasting.channelstarget` ct
   ON ga.Month = ct.Month
  AND ga.Channel = ct.Channel
 
--- Join Aggregated Monthly Paid Media
-FULL OUTER JOIN pm_monthly pm
+FULL OUTER JOIN pm_daily pm
   ON COALESCE(ga.Month, ct.Month) = pm.Month
- AND COALESCE(ga.Channel, ct.Channel) = pm.Channel
+ AND COALESCE(ga.Channel, ct.Channel) = pm.Channel;
