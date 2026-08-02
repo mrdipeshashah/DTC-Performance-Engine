@@ -1,4 +1,5 @@
--- 1. Daily MTD Shopify Actuals (Dynamic up to yesterday)
+CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.3.3_overall-performance-view-withtargets` AS
+
 WITH shopify_daily AS (
   SELECT
     DATE_TRUNC(`Date`, MONTH) AS Month,
@@ -37,8 +38,8 @@ ga_daily AS (
 SELECT
   COALESCE(s.Month, ga.Month, pm.Month, t.Month) AS Month,
 
-  -- Live Date Pacing Helpers
-  EXTRACT(DAY FROM CURRENT_DATE() - 1) AS current_day_of_month,
+  -- Live Date Pacing Helpers (Prevents 0-division on Day 1 of the month)
+  GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1) AS current_day_of_month,
   EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS days_in_current_month,
 
   -- Shopify Actuals
@@ -63,6 +64,40 @@ SELECT
   COALESCE(t.Total_Customers_Target, 0) AS Target_Total_Customers,
   COALESCE(t.New_Customers_Target, 0) AS Target_New_Customers,
   COALESCE(t.Profit_Target, 0) AS Target_Profit,
+
+  -- Projected Run-Rate Calculations (Safe for Day 1)
+  SAFE_DIVIDE(COALESCE(s.Shopify_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Total_Revenue,
+
+  SAFE_DIVIDE(COALESCE(s.Profit, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Total_Profit,
+
+  SAFE_DIVIDE(COALESCE(s.Shopify_Orders, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Total_Orders,
+
+  SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Spend,
+
+  -- Projected Delivery / Pacing % Calculations
+  SAFE_DIVIDE(
+    SAFE_DIVIDE(COALESCE(s.Shopify_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    NULLIF(t.Revenue_Target, 0)
+  ) AS Projected_Revenue_Delivery_Pct,
+
+  SAFE_DIVIDE(
+    SAFE_DIVIDE(COALESCE(s.Profit, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    NULLIF(t.Profit_Target, 0)
+  ) AS Projected_Profit_Delivery_Pct,
+
+  SAFE_DIVIDE(
+    SAFE_DIVIDE(COALESCE(s.Shopify_Orders, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    NULLIF(t.Conversions_Target, 0)
+  ) AS Projected_Orders_Delivery_Pct,
+
+  SAFE_DIVIDE(
+    SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    NULLIF(t.Spend_Target, 0)
+  ) AS Spend_Pacing_Pct,
 
   -- Daily Run-Rate Target Helpers
   SAFE_DIVIDE(COALESCE(t.Revenue_Target, 0), EXTRACT(DAY FROM LAST_DAY(COALESCE(s.Month, ga.Month, pm.Month, t.Month)))) AS daily_revenue_target,
