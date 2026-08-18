@@ -1,6 +1,8 @@
+# OVERVIEW
+
 # DTC Commercial Operations & Customer Acquisition 
 
-Built an end-to-end solution using **Google BigQuery**, **GoogleSheets** and **Data Studio** that collates data from ad-platforms, google analytics, and defined targets to deliver daily budget, conversion run-rate and pacing insights. 
+This repository contains Big Query code to build an automated end-to-end solution that collates data from ad-platforms, google analytics, and defined targets to deliver daily budget, conversion run-rate and pacing insights. 
 
 https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
 
