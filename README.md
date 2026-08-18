@@ -1,10 +1,10 @@
-# 🚀 DTC Commercial Operations & Customer Acquisition 
+# DTC Commercial Operations & Customer Acquisition 
 
 Built an end-to-end solution using **Google BigQuery**, **GoogleSheets** and **Data Studio** that collates data from ad-platforms, google analytics, and defined targets to deliver daily budget, conversion run-rate and pacing insights. 
 
 https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
 
@@ -26,7 +26,7 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | `1.4_mtd-keymetrics-tracker` | Dynamic Month-to-Date key metrics tracker up to yesterday | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 | `2.7_stg-daily_v_monthly` | Closed-month data integrity & variance checker (Daily vs. Monthly rollups) | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly` |
 
-## 📊 Data Requirements & Schema
+## Data Requirements & Schema
 
 The system unifies three distinct data requirements into a single analytical view.
 
@@ -137,7 +137,7 @@ This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and
 | | New_Customers_Target | `New_Customers_Target` | `INTEGER` | New buyer target |
 | | **Profit_Target** | **`Profit_Target`** | **`NUMERIC`** | **Store Gross Profit Target** |
 
-### 🧮 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
+### 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
 
 #### Core Blended Metrics
 * **POAS (Profit on Ad Spend):** `Shopify Profit / Paid Media Cost`
@@ -159,7 +159,7 @@ SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 ((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
 ```
 
-## 📊 Looker Studio Calculated Fields Documentation
+## Looker Studio Calculated Fields Documentation
 
 This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
 
@@ -293,7 +293,7 @@ This section documents the calculated field specifications for the BigQuery-back
 
 ______________________
  
- ### 🧮 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
+ ### 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
 
 #### Core Blended Metrics
 * **POAS (Profit on Ad Spend):** `Shopify Profit / Paid Media Cost`
@@ -322,7 +322,7 @@ SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE
 
 ---
 
-## 📊 Looker Studio Calculated Fields Documentation
+## Looker Studio Calculated Fields Documentation
 
 This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
 
