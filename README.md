@@ -10,13 +10,13 @@ Data Studio Dashboard - https://datastudio.google.com/reporting/d2b7b27e-3607-4e
 
 The Google Sheet template shared is for setting channels targets and combined targets 
 
-## Architecture Overview
+## ARCHITECTURE OVERVIEW
 
 The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
 
-## Reporting Views & Lineage Matrix
+## REPORTING VIEWS & LINEAGE MATRIX
 
-### Final Reporting Views (Looker Studio Core)
+### FINAL REPORTING VIEWS (DATA STUDIO CORE DASHBOARD)
 
 | Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
 | :--- | :--- |
@@ -25,18 +25,18 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | `3.2_channel-performance-view-withtargets` | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
 | `3.3_overall-performance-view-withtargets` | `2.2_stg-shopify-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 
-### Key Data Health & Reconciliation Views (Frequent Audit Tools)
+### KEY DATA HEALTH & RECONCILIATION VIEWS (FREQUENT AUDIT TOOLS) 
 
 | Utility / Audit View (`1.x` / `2.x`) | Purpose | Upstream Dependencies |
 | :--- | :--- | :--- |
 | `1.4_mtd-keymetrics-tracker` | Dynamic Month-to-Date key metrics tracker up to yesterday | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 | `2.7_stg-daily_v_monthly` | Closed-month data integrity & variance checker (Daily vs. Monthly rollups) | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly` |
 
-## Data Requirements & Schema
+## DATA REQUIREMENTS & SCHEMA
 
 The system unifies three distinct data requirements into a single analytical view.
 
-### 1. Paid Media Delivery Schema (e.g., via Funnel.io)
+### 1. PAID MEDIA DELIVERY SCHEMA
 Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily level.
 
 | Field Name | Type | Description |
@@ -48,7 +48,7 @@ Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily le
 | `Impressions` | `INTEGER` | Total ad impressions |
 | `Clicks` | `INTEGER` | Total ad clicks |
 
-### 2. Google Analytics Delivery Schema (via GA4 Export)
+### 2. GOOGLE ANALYTICS DELIVERY SCHEMA
 Tracks site-level sessions and conversion activity for **all traffic sources** (Paid & Organic).
 
 Requires 2 staging views: Daily (`2.1_stg-googleanalytics-daily`) and Monthly (`2.5_stg-googleanalytics-monthly`).
@@ -61,7 +61,7 @@ Requires 2 staging views: Daily (`2.1_stg-googleanalytics-daily`) and Monthly (`
 | `GA Transactions`| `INTEGER` | Completed conversions/orders |
 | `GA Revenue` | `NUMERIC` | Total attributed revenue (£) |
 
-### 3. Key Business Metrics Delivery Schema (Shopify/ERP)
+### 3. KEY BUSINESS METRICS DELIVERY SCHEMA (SHOPIFY/ERP)
 Tracks key storewide business and customer metrics.
 
 Requires 2 staging views: Daily (`2.2_stg-shopify-daily`) and Monthly (`2.6_stg-shopify-monthly`).
@@ -75,7 +75,7 @@ Requires 2 staging views: Daily (`2.2_stg-shopify-daily`) and Monthly (`2.6_stg-
 | `New_Customers` | `INTEGER` | First-time purchasing customer volume |
 | `Profit` | `NUMERIC` | Gross/Net profit (£) |
 
-### 4. Channel Targets Schema (Google Sheets Input)
+### 4. CHANNEL TARGETS SCHEMA (GOOGLE SHEETS)
 Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
@@ -89,7 +89,7 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Revenue Target` | `NUMERIC` | Target channel revenue (£) |
 | `Notes` | `STRING` | Strategic context notes |
 
-### 5. All Targets Schema (Google Sheets Input)
+### 5. ALL TARGETS SCHEMA (GOOGLE SHEETS)
 Human-managed storewide target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
@@ -102,11 +102,11 @@ Human-managed storewide target benchmarks maintained in Google Sheets (`Marketin
 | `New_Customers_Target` | `INTEGER` | Target new customer volume |
 | `Profit Target` | `NUMERIC` | Target gross profit (£) |
 
-## 📖 Master Data Dictionary & Field Mapping Reference
+## MASTER DATA DICTIONARY & FIELD MAPPING REFERENCE 
 
-This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and defines standardized calculation logic for downstream SQL modeling and Looker Studio reporting.
+This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Looker Studio reporting.
 
-### 📑 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
+### 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
 
 | Source Sheet Tab | Google Sheet Header | BigQuery Field Name | Data Type | Notes / Clean Transformations |
 | :--- | :--- | :--- | :--- | :--- |
@@ -165,7 +165,7 @@ SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 ((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
 ```
 
-## Looker Studio Calculated Fields Documentation
+## Data Studio Calculated Fields Documentation
 
 This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
 
@@ -328,7 +328,7 @@ SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE
 
 ---
 
-## Looker Studio Calculated Fields Documentation
+## Data Studio Calculated Fields Documentation
 
 This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
 
