@@ -1,10 +1,14 @@
 # OVERVIEW
 
-# DTC Commercial Operations & Customer Acquisition 
-
 This repository contains Big Query code to build an automated end-to-end solution that collates data from ad-platforms, google analytics, and defined targets to deliver daily budget, conversion run-rate and pacing insights. 
 
-https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
+# DASHBOARD & GOOGLE SHEET TEMPLATE
+
+Google Sheet Template - https://docs.google.com/spreadsheets/d/1h9bdhZ442xld7QvSfQDYv1YYpQl0XNnF8Tj9kE4sR7s/edit?usp=sharing
+
+Data Studio Dashboard - https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
+
+The Google Sheet template shared is for setting channels targets and combined targets 
 
 ## Architecture Overview
 
