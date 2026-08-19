@@ -34,7 +34,7 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 
 ## DATA REQUIREMENTS & SCHEMA
 
-The system unifies three distinct data requirements into a single analytical view.
+Unifing data requirements into a single analytical view.
 
 ### 1. PAID MEDIA DELIVERY SCHEMA
 Tracks platform-level performance (Google Ads, Meta, TikTok, etc.) at a daily level.
