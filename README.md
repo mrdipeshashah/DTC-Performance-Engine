@@ -16,8 +16,6 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 
 ## REPORTING VIEWS & LINEAGE MATRIX
 
-The table shows 
-
 ### FINAL REPORTING VIEWS 
 
 | Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
