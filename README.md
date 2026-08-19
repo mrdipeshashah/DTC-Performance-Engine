@@ -152,7 +152,7 @@ This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and
 * **Blended CPA:** `Paid Media Cost / Shopify Orders`
 * **Blended CAC (New Customers):** `Paid Media Cost / New Customers`
 
-#### Profit & Pacing SQL Logic
+#### PROFIT & PACING SQL LOGIC
 
 ```sql
 -- Daily Target Run-Rate (Overall Profit Target / Days in Month)
@@ -165,7 +165,7 @@ SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 ((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
 ```
 
-## Data Studio Calculated Fields Documentation
+## DATA STUDIO CALCULATED FIELDS 
 
 This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
 
