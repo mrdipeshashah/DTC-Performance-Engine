@@ -104,7 +104,7 @@ Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Tar
 
 ## MASTER DATA DICTIONARY & FIELD MAPPING REFERENCE 
 
-This reference maps all raw data views to raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Data Studio reporting.
+This reference maps all raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Data Studio reporting.
 
 ### 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
 
