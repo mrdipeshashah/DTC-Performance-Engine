@@ -25,7 +25,7 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | `3.2_channel-performance-view-withtargets` | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
 | `3.3_overall-performance-view-withtargets` | `2.2_stg-shopify-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 
-### KEY DATA HEALTH & RECONCILIATION VIEWS (FREQUENT AUDIT TOOLS) 
+### KEY DATA HEALTH & RECONCILIATION VIEWS (AUDIT TOOLS) 
 
 | Utility / Audit View (`1.x` / `2.x`) | Purpose | Upstream Dependencies |
 | :--- | :--- | :--- |
