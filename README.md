@@ -12,7 +12,7 @@ The Google Sheet template shared is for setting channels targets and combined ta
 
 ## ARCHITECTURE OVERVIEW
 
-The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
+The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Data Studio.
 
 ## REPORTING VIEWS & LINEAGE MATRIX
 
