@@ -76,7 +76,7 @@ Requires 2 staging views: Daily (`2.2_stg-shopify-daily`) and Monthly (`2.6_stg-
 | `Profit` | `NUMERIC` | Gross/Net profit (£) |
 
 ### 4. CHANNEL TARGETS SCHEMA (GOOGLE SHEETS)
-Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
+Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
@@ -90,7 +90,7 @@ Human-managed target benchmarks maintained in Google Sheets (`Marketing_Targets_
 | `Notes` | `STRING` | Strategic context notes |
 
 ### 5. ALL TARGETS SCHEMA (GOOGLE SHEETS)
-Human-managed storewide target benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
+Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Targets_Master`).
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
