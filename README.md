@@ -104,7 +104,7 @@ Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Tar
 
 ## MASTER DATA DICTIONARY & FIELD MAPPING REFERENCE 
 
-This reference maps all raw Google Sheets tabs to raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Looker Studio reporting.
+This reference maps all raw data views to raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Data Studio reporting.
 
 ### 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
 
@@ -167,7 +167,7 @@ SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
 
 ## DATA STUDIO CALCULATED FIELDS 
 
-This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
+This section documents the calculated field specifications for the BigQuery-backed Data Studio Dashboard.
 
 ### Data Source 1: `3.3_overall-performance-view-withtargets`
 *Primary dataset for executive summary, overall store health, profitability, customer acquisition, and storewide target pacing.*
@@ -330,7 +330,7 @@ SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE
 
 ## Data Studio Calculated Fields Documentation
 
-This section documents the calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
+This section documents the calculated field specifications for the BigQuery-backed Data Studio Dashboard.
 
 ### Data Source 1: `3.3_overall-performance-view-withtargets`
 *Primary dataset for executive summary, overall store health, profitability, customer acquisition, and storewide target pacing.*
