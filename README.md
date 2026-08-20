@@ -143,28 +143,6 @@ Maps all raw BigQuery schema fields and defines standardised calculation logic f
 | | New_Customers_Target | `New_Customers_Target` | `INTEGER` | New buyer target |
 | | **Profit_Target** | **`Profit_Target`** | **`NUMERIC`** | **Store Gross Profit Target** |
 
-### 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
-
-#### Core Blended Metrics
-* **POAS (Profit on Ad Spend):** `Shopify Profit / Paid Media Cost`
-* **ROAS (Return on Ad Spend):** `Shopify Revenue / Paid Media Cost`
-* **Gross Profit Margin %:** `Shopify Profit / Shopify Revenue`
-* **Blended CPA:** `Paid Media Cost / Shopify Orders`
-* **Blended CAC (New Customers):** `Paid Media Cost / New Customers`
-
-#### PROFIT & PACING SQL LOGIC
-
-```sql
--- Daily Target Run-Rate (Overall Profit Target / Days in Month)
-COALESCE(t.Profit_Target, 0) / EXTRACT(DAY FROM LAST_DAY(r.date)) AS daily_profit_target,
-
--- Month-to-Date Profit Delivery %
-SAFE_DIVIDE(SUM(s.Profit), MAX(t.Profit_Target)) AS pct_profit_target_delivered,
-
--- Projected Month-End Profit Variance (£)
-((SAFE_DIVIDE(SUM(s.Profit), EXTRACT(DAY FROM DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY))) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))) - MAX(t.Profit_Target)) AS projected_profit_variance
-```
-
 ## DATA STUDIO CALCULATED FIELDS 
 
 This section documents the calculated field specifications for the BigQuery-backed Data Studio Dashboard.
@@ -263,33 +241,6 @@ This section documents the calculated field specifications for the BigQuery-back
 
 ______________________
  
- ### 2. Staging & Master Layer Metrics (`stg_` / `rpt_`)
-
-#### Core Blended Metrics
-* **POAS (Profit on Ad Spend):** `Shopify Profit / Paid Media Cost`
-* **ROAS (Return on Ad Spend):** `Shopify Revenue / Paid Media Cost`
-* **Gross Profit Margin %:** `Shopify Profit / Shopify Revenue`
-* **Blended CPA:** `Paid Media Cost / Shopify Orders`
-* **Blended CAC (New Customers):** `Paid Media Cost / New Customers`
-
-#### Profit, Pacing & Day-1 Safe SQL Logic
-
-```sql
--- Dynamic Day-1 Safe Calculation (Avoids Division by Zero)
-GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1) AS safe_elapsed_days,
-
--- Daily Target Run-Rate (Overall Target / Total Days in Month)
-COALESCE(t.Profit_Target, 0) / EXTRACT(DAY FROM LAST_DAY(r.date)) AS daily_profit_target,
-
--- Native BigQuery Month-End Revenue Projection
-SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-  * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Channel_Revenue,
-
--- Native BigQuery Month-End Spend Projection
-SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-  * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Channel_Spend
-```
-
 ---
 
 ## Data Studio Calculated Fields Documentation
