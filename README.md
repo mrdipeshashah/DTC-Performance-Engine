@@ -148,6 +148,7 @@ Maps all raw BigQuery schema fields and defines standardised calculation logic f
 Documents calculated field specifications for the BigQuery-backed Looker Studio Dashboard.
 
 ### Data Source 1: `3.3_overall-performance-view-withtargets`
+
 *Primary dataset for executive summary, overall store health, profitability, customer acquisition, and storewide target pacing.*
 
 #### A. Profitability & Unit Economics
@@ -192,7 +193,8 @@ Documents calculated field specifications for the BigQuery-backed Looker Studio 
 ---
 
 ### Data Source 2: `3.2_channel-performance-view-withtargets`
-> **Description:** Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics (using safe division calculations).
+
+*Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics (using safe division calculations)*
 
 #### A. Core Efficiency & Delivery
 
@@ -216,7 +218,8 @@ Documents calculated field specifications for the BigQuery-backed Looker Studio 
 ---
 
 ### Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
-> **Description:** Primary dataset for executive summary, overall store health, storewide projections, target pacing, and run-rate analytics.
+
+Primary dataset for executive summary, overall store health, storewide projections, target pacing, and run-rate analytics*
 
 #### Overall Run-Rate & Projections (Pacing)
 
