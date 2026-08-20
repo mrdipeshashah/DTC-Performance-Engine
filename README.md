@@ -106,7 +106,7 @@ Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Tar
 
 Maps all raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Data Studio reporting.
 
-### 1. BigQuery Views
+### BigQuery Views
 
 | Source Sheet Tab | Google Sheet Header | BigQuery Field Name | Data Type | Notes / Clean Transformations |
 | :--- | :--- | :--- | :--- | :--- |
