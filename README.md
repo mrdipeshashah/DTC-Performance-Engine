@@ -212,52 +212,7 @@ This section documents the calculated field specifications for the BigQuery-back
 | **GA4 Tracking Coverage Ratio %** | `SUM(ga_transactions) / SUM(shopify_orders)` | Percent | GA4 transaction capture rate vs. Shopify |
 
 ### Data Source 2: `3.2_channel-performance-view-withtargets`
-*Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics.*
 
-#### A. Core Efficiency & Static Delivery
-* **GA Conversion Rate (CVR)**
-  * **Type:** Percent
-  * **Formula:** `SUM(Actual_Transactions) / SUM(Actual_Sessions)`
-* **GA Average Order Value (AOV)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Actual_Revenue) / SUM(Actual_Transactions)`
-* **Channel Revenue Delivery %**
-  * **Type:** Percent
-  * **Formula:** `SUM(Actual_Revenue) / SUM(Target_Revenue)`
-* **Channel Conversion Delivery %**
-  * **Type:** Percent
-  * **Formula:** `SUM(Actual_Transactions) / SUM(Target_Conversions)`
-* **Channel Revenue Variance (£)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Actual_Revenue) - SUM(Target_Revenue)`
-* **Channel Conversion Variance (Orders)**
-  * **Type:** Number
-  * **Formula:** `SUM(Actual_Transactions) - SUM(Target_Conversions)`
-
-#### B. Run-Rate & Projections (Pacing)
-* **Expected Channel Spend (To Date)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Spend) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))`
-* **Expected Channel Revenue (To Date)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Revenue) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))`
-* **Projected Channel Revenue (Month End)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Revenue) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)`
-* **Projected Channel Revenue Delivery %**
-  * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Revenue) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Revenue)`
-* **Expected Channel Conversions (To Date)**
-  * **Type:** Number
-  * **Formula:** `SUM(Target_Conversions) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))`
-* **Projected Channel Conversions (Month End)**
-  * **Type:** Number
-  * **Formula:** `(SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)`
-* **Projected Channel Conversions Delivery %**
-  * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Conversions)`
- 
-# Data Source 2: `3.2_channel-performance-view-withtargets`
 > **Description:** Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics.
 
 ## A. Core Efficiency & Static Delivery
