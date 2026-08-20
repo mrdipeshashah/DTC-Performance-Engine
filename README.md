@@ -32,7 +32,7 @@ The reporting pipeline transforms raw data feeds into production-ready BigQuery 
 | `1.4_mtd-keymetrics-tracker` | Dynamic Month-to-Date key metrics tracker up to yesterday | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.0_stg-paidmedia`<br>`2.4_stg-alltargets` |
 | `2.7_stg-daily_v_monthly` | Closed-month data integrity & variance checker (Daily vs. Monthly rollups) | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly` |
 
-## Dashboard Lineage & Page Mapping DASHBOARD & PAGE MAPPING
+## DASHBOARD LINEAGE & PAGE MAPPING
 
 | Dashboard Page | Primary Data Source (BQ View) 
 | :--- | :--- |
