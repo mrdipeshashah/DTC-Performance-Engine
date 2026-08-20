@@ -425,40 +425,7 @@ This section documents the calculated field specifications for the BigQuery-back
 ---
 
 ### Data Source 2: `3.2_channel-performance-view-withtargets`
-*Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics.*
 
-#### A. Core Efficiency & Delivery
-* **GA Conversion Rate (CVR)**
-  * **Type:** Percent
-  * **Formula:** `SAFE_DIVIDE(SUM(Actual_Transactions), SUM(Actual_Sessions))`
-* **GA Average Order Value (AOV)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SAFE_DIVIDE(SUM(Actual_Revenue), SUM(Actual_Transactions))`
-* **Channel Revenue Delivery %**
-  * **Type:** Percent
-  * **Formula:** `SAFE_DIVIDE(SUM(Actual_Revenue), SUM(Target_Revenue))`
-* **Channel Conversion Delivery %**
-  * **Type:** Percent
-  * **Formula:** `SAFE_DIVIDE(SUM(Actual_Transactions), SUM(Target_Conversions))`
-* **Channel Revenue Variance (£)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Actual_Revenue) - SUM(Target_Revenue)`
-
-#### B. Native Run-Rate & Projections (Pacing)
-* **Projected Channel Revenue (Month End)**
-  * **Type:** Currency (GBP)
-  * **Source Field:** Native `Projected_Channel_Revenue` from BigQuery View
-* **Projected Channel Spend (Month End)**
-  * **Type:** Currency (GBP)
-  * **Source Field:** Native `Projected_Channel_Spend` from BigQuery View
-* **Projected Channel Revenue Delivery %**
-  * **Type:** Percent
-  * **Formula:** `SAFE_DIVIDE(SUM(Projected_Channel_Revenue), SUM(Target_Revenue))`
-* **Projected Channel Spend Utilization %**
-  * **Type:** Percent
-  * **Formula:** `SAFE_DIVIDE(SUM(Projected_Channel_Spend), SUM(Target_Spend))`
- 
-# Data Source 2: `3.2_channel-performance-view-withtargets`
 > **Description:** Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics (using safe division calculations).
 
 ## A. Core Efficiency & Delivery
