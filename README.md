@@ -485,46 +485,7 @@ This section documents the calculated field specifications for the BigQuery-back
 ---
 
 ### Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
-
-#### Overall Run-Rate & Projections (Pacing)
-* **Expected Spend (To Date)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Spend) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
-* **Projected Total Spend (Month End)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
-* **Projected Spend Pacing %**
-  * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Spend)`
-* **Expected Revenue (To Date)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Revenue) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
-* **Projected Total Revenue (Month End)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
-* **Projected Total Revenue Delivery %**
-  * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Revenue)`
-* **Expected Total Profit (To Date)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `SUM(Target_Profit) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
-* **Projected Total Profit (Month End)**
-  * **Type:** Currency (GBP)
-  * **Formula:** `(SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
-* **Projected Profit Delivery %**
-  * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Profit)`
-* **Expected Total Orders (To Date)**
-  * **Type:** Number
-  * **Formula:** `SUM(Target_Conversions) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))`
-* **Projected Total Orders (Month End)**
-  * **Type:** Number
-  * **Formula:** `(SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)`
-* **Projected Orders Delivery %**
-  * **Type:** Percent
-  * **Formula:** `((SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Conversions)`
  
-# Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
 > **Description:** Primary dataset for executive summary, overall store health, storewide projections, target pacing, and run-rate analytics.
 
 ## Overall Run-Rate & Projections (Pacing)
