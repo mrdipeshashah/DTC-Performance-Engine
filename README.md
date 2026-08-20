@@ -80,7 +80,7 @@ Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Tar
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
-| `Month` | `DATE` | Target month start date (`YYYY-MM-01`) |
+| `Month` | `DATE` | Target month start date (`YYYY-MM-DD`) |
 | `Channel` | `STRING` | Target marketing channel |
 | `Campaign` | `STRING` | Target campaign identifier |
 | `Spend Target` | `NUMERIC` | Allocated monthly budget (£) |
@@ -94,7 +94,7 @@ Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Tar
 
 | Field Name | Type | Description |
 | :--- | :--- | :--- |
-| `Month` | `DATE` | Target month start date (`YYYY-MM-01`) |
+| `Month` | `DATE` | Target month start date (`YYYY-MM-DD`) |
 | `Spend Target` | `NUMERIC` | Allocated monthly store budget (£) |
 | `Conversions Target` | `INTEGER` | Target total order volume |
 | `Revenue Target` | `NUMERIC` | Target total revenue (£) |
@@ -106,28 +106,28 @@ Manually inputted targets benchmarks maintained in Google Sheets (`Marketing_Tar
 
 Maps all raw BigQuery schema fields and defines standardised calculation logic for downstream SQL modeling and Data Studio reporting.
 
-### 1. Raw Layer (`raw_`) — Google Sheets to BigQuery Tables
+### 1. BigQuery Views
 
 | Source Sheet Tab | Google Sheet Header | BigQuery Field Name | Data Type | Notes / Clean Transformations |
 | :--- | :--- | :--- | :--- | :--- |
-| **`PaidMedia`** | Date | `Date` | `DATE` | Link Range: `PaidMedia!A1:F` |
-| | Channel | `Channel` | `STRING` | Standardized channel string |
+| **`PaidMedia`** | Date | `Date` | `DATE` | `YYYY-MM-DD` |
+| | Channel | `Channel` | `STRING` | Channel name |
 | | Campaign | `Campaign` | `STRING` | Campaign name grouping |
-| | Cost | `Cost` | `NUMERIC` | Raw ad spend |
+| | Cost | `Cost` | `NUMERIC` | Ad spend |
 | | Impressions | `Impressions` | `INTEGER` | Total ad impressions |
 | | Clicks | `Clicks` | `INTEGER` | Total ad clicks |
-| **`GoogleAnalytics`** | Date | `Date` | `DATE` | Link Range: `GoogleAnalytics!A1:E` |
+| **`GoogleAnalytics`** | Date | `Date` | `DATE` | `YYYY-MM-DD` |
 | | Channel | `Channel` | `STRING` | Web traffic source grouping |
 | | Sessions | `Sessions` | `INTEGER` | GA4 session counts |
 | | GA Transactions | `GA_Transactions` | `INTEGER` | Web order conversions |
 | | GA Revenue | `GA_Revenue` | `NUMERIC` | E-commerce revenue |
-| **`Shopify`** | Date | `Date` | `DATE` | Link Range: `Shopify!A1:F` |
+| **`Shopify`** | Date | `Date` | `DATE` | `YYYY-MM-DD` |
 | | Shopify_Orders | `Shopify_Orders` | `INTEGER` | Order count from Store |
 | | Shopify_Revenue | `Shopify_Revenue` | `NUMERIC` | Gross store revenue |
 | | Total_Customers | `Total_Customers` | `INTEGER` | Total active buying customers |
 | | New_Customers | `New_Customers` | `INTEGER` | First-time buyers |
 | | **Profit** | **`Profit`** | **`NUMERIC`** | **Net/Gross Profit (£)** |
-| **`ChannelsTargets`** | Month | `Month` | `DATE` | Link Range: `ChannelsTargets!A1:H` |
+| **`ChannelsTargets`** | Month | `Month` | `DATE` | `YYYY-MM-DD` |
 | | Channel | `Channel` | `STRING` | Target channel |
 | | Campaign | `Campaign` | `STRING` | Target campaign |
 | | Spend Target | `Spend_Target` | `NUMERIC` | Planned channel spend |
@@ -135,7 +135,7 @@ Maps all raw BigQuery schema fields and defines standardised calculation logic f
 | | Target CPA | `Target_CPA` | `NUMERIC` | Target CPA benchmark |
 | | Revenue Target | `Revenue_Target` | `NUMERIC` | Target channel revenue |
 | | Notes | `Notes` | `STRING` | Context notes |
-| **`AllTargets`** | Month | `Month` | `DATE` | Link Range: `AllTargets!A1:G` |
+| **`AllTargets`** | Month | `Month` | `DATE` | `YYYY-MM-DD` |
 | | Spend Target | `Spend_Target` | `NUMERIC` | Total store spend target |
 | | Conversions Target | `Conversions_Target` | `INTEGER` | Total store order target |
 | | Revenue Target | `Revenue_Target` | `NUMERIC` | Total store revenue target |
