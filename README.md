@@ -256,6 +256,34 @@ This section documents the calculated field specifications for the BigQuery-back
 * **Projected Channel Conversions Delivery %**
   * **Type:** Percent
   * **Formula:** `((SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Conversions)`
+ 
+# Data Source 2: `3.2_channel-performance-view-withtargets`
+> **Description:** Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics.
+
+## A. Core Efficiency & Static Delivery
+
+| Field Name | Type | Formula | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| **GA Conversion Rate (CVR)** | Percent | `SUM(Actual_Transactions) / SUM(Actual_Sessions)` | Channel CVR based on GA4 sessions |
+| **GA Average Order Value (AOV)** | Currency (GBP) | `SUM(Actual_Revenue) / SUM(Actual_Transactions)` | Average revenue per order |
+| **Channel Revenue Delivery %** | Percent | `SUM(Actual_Revenue) / SUM(Target_Revenue)` | Pacing toward revenue goal |
+| **Channel Conversion Delivery %** | Percent | `SUM(Actual_Transactions) / SUM(Target_Conversions)` | Pacing toward order volume goal |
+| **Channel Revenue Variance (£)** | Currency (GBP) | `SUM(Actual_Revenue) - SUM(Target_Revenue)` | Absolute difference vs target revenue |
+| **Channel Conversion Variance (Orders)** | Number | `SUM(Actual_Transactions) - SUM(Target_Conversions)` | Absolute difference vs target orders |
+
+---
+
+## B. Run-Rate & Projections (Pacing)
+
+| Field Name | Type | Formula | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| **Expected Channel Spend (To Date)** | Currency (GBP) | `SUM(Target_Spend) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))` | Expected spend run-rate to current day |
+| **Expected Channel Revenue (To Date)** | Currency (GBP) | `SUM(Target_Revenue) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))` | Expected revenue run-rate to current day |
+| **Projected Channel Revenue (Month End)** | Currency (GBP) | `(SUM(Actual_Revenue) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)` | Projected month-end revenue total |
+| **Projected Channel Revenue Delivery %** | Percent | `((SUM(Actual_Revenue) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Revenue)` | Projected % of target revenue achieved |
+| **Expected Channel Conversions (To Date)** | Number | `SUM(Target_Conversions) * ((EXTRACT(DAY FROM CURRENT_DATE()) - 1) / DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY))` | Expected order volume to current day |
+| **Projected Channel Conversions (Month End)** | Number | `(SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)` | Projected month-end total orders |
+| **Projected Channel Conversions Delivery %** | Percent | `((SUM(Actual_Transactions) / (EXTRACT(DAY FROM CURRENT_DATE()) - 1)) * DATETIME_DIFF(DATETIME_ADD(DATETIME_TRUNC(MAX(Month), MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(MAX(Month), MONTH), DAY)) / SUM(Target_Conversions)` | Projected % of target orders achieved |
 
 ### Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
 
@@ -296,6 +324,26 @@ This section documents the calculated field specifications for the BigQuery-back
 * **Projected Orders Delivery %**
   * **Type:** Percent
   * **Formula:** `((SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Conversions)`
+
+# Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
+> **Description:** Primary dataset for executive summary, overall store health, storewide projections, target pacing, and run-rate analytics.
+
+## Overall Run-Rate & Projections (Pacing)
+
+| Field Name | Type | Formula | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| **Expected Spend (To Date)** | Currency (GBP) | `SUM(Target_Spend) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target ad spend run-rate to current day |
+| **Projected Total Spend (Month End)** | Currency (GBP) | `(SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated total spend by month-end |
+| **Projected Spend Pacing %** | Percent | `((SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Spend)` | Projected budget utilization rate |
+| **Expected Revenue (To Date)** | Currency (GBP) | `SUM(Target_Revenue) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target revenue run-rate to current day |
+| **Projected Total Revenue (Month End)** | Currency (GBP) | `(SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated total Shopify revenue by month-end |
+| **Projected Total Revenue Delivery %** | Percent | `((SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Revenue)` | Projected % of revenue target achieved |
+| **Expected Total Profit (To Date)** | Currency (GBP) | `SUM(Target_Profit) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target profit run-rate to current day |
+| **Projected Total Profit (Month End)** | Currency (GBP) | `(SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated gross profit by month-end |
+| **Projected Profit Delivery %** | Percent | `((SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Profit)` | Projected % of profit target achieved |
+| **Expected Total Orders (To Date)** | Number | `SUM(Target_Conversions) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target order volume run-rate to current day |
+| **Projected Total Orders (Month End)** | Number | `(SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated total orders by month-end |
+| **Projected Orders Delivery %** | Percent | `((SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Conversions)` | Projected % of order target achieved |
 
 ______________________
  
@@ -409,6 +457,30 @@ This section documents the calculated field specifications for the BigQuery-back
 * **Projected Channel Spend Utilization %**
   * **Type:** Percent
   * **Formula:** `SAFE_DIVIDE(SUM(Projected_Channel_Spend), SUM(Target_Spend))`
+ 
+# Data Source 2: `3.2_channel-performance-view-withtargets`
+> **Description:** Secondary dataset for channel breakdowns, campaign performance, ad efficiency, and unit economics (using safe division calculations).
+
+## A. Core Efficiency & Delivery
+
+| Field Name | Type | Formula / Source | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| **GA Conversion Rate (CVR)** | Percent | `SAFE_DIVIDE(SUM(Actual_Transactions), SUM(Actual_Sessions))` | Channel conversion rate using GA4 sessions |
+| **GA Average Order Value (AOV)** | Currency (GBP) | `SAFE_DIVIDE(SUM(Actual_Revenue), SUM(Actual_Transactions))` | Average revenue per completed order |
+| **Channel Revenue Delivery %** | Percent | `SAFE_DIVIDE(SUM(Actual_Revenue), SUM(Target_Revenue))` | Revenue pacing relative to channel target |
+| **Channel Conversion Delivery %** | Percent | `SAFE_DIVIDE(SUM(Actual_Transactions), SUM(Target_Conversions))` | Order volume pacing relative to channel target |
+| **Channel Revenue Variance (£)** | Currency (GBP) | `SUM(Actual_Revenue) - SUM(Target_Revenue)` | Net difference vs channel revenue target |
+
+---
+
+## B. Native Run-Rate & Projections (Pacing)
+
+| Field Name | Type | Formula / Source | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| **Projected Channel Revenue (Month End)** | Currency (GBP) | `Projected_Channel_Revenue` (BigQuery View) | Native BigQuery month-end revenue projection |
+| **Projected Channel Spend (Month End)** | Currency (GBP) | `Projected_Channel_Spend` (BigQuery View) | Native BigQuery month-end spend projection |
+| **Projected Channel Revenue Delivery %** | Percent | `SAFE_DIVIDE(SUM(Projected_Channel_Revenue), SUM(Target_Revenue))` | Projected revenue as a % of target |
+| **Projected Channel Spend Utilization %** | Percent | `SAFE_DIVIDE(SUM(Projected_Channel_Spend), SUM(Target_Spend))` | Projected budget consumption as a % of target |
 
 ---
 
@@ -451,3 +523,23 @@ This section documents the calculated field specifications for the BigQuery-back
 * **Projected Orders Delivery %**
   * **Type:** Percent
   * **Formula:** `((SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Conversions)`
+ 
+# Data Source 3: `3.3_overall-performance-view-withtargets` (Storewide Projections)
+> **Description:** Primary dataset for executive summary, overall store health, storewide projections, target pacing, and run-rate analytics.
+
+## Overall Run-Rate & Projections (Pacing)
+
+| Field Name | Type | Formula / Source | Description / Notes |
+| :--- | :--- | :--- | :--- |
+| **Expected Spend (To Date)** | Currency (GBP) | `SUM(Target_Spend) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target ad spend run-rate to current day |
+| **Projected Total Spend (Month End)** | Currency (GBP) | `(SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated total spend by month-end |
+| **Projected Spend Pacing %** | Percent | `((SUM(Actual_Spend) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Spend)` | Projected budget utilization rate |
+| **Expected Revenue (To Date)** | Currency (GBP) | `SUM(Target_Revenue) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target revenue run-rate to current day |
+| **Projected Total Revenue (Month End)** | Currency (GBP) | `(SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated total Shopify revenue by month-end |
+| **Projected Total Revenue Delivery %** | Percent | `((SUM(Actual_Shopify_Revenue) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Revenue)` | Projected % of revenue target achieved |
+| **Expected Total Profit (To Date)** | Currency (GBP) | `SUM(Target_Profit) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target profit run-rate to current day |
+| **Projected Total Profit (Month End)** | Currency (GBP) | `(SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated gross profit by month-end |
+| **Projected Profit Delivery %** | Percent | `((SUM(Actual_Profit) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Profit)` | Projected % of profit target achieved |
+| **Expected Total Orders (To Date)** | Number | `SUM(Target_Conversions) * (MAX(current_day_of_month - 1) / MAX(days_in_current_month))` | Target order volume run-rate to current day |
+| **Projected Total Orders (Month End)** | Number | `(SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)` | Estimated total orders by month-end |
+| **Projected Orders Delivery %** | Percent | `((SUM(Actual_Shopify_Orders) / MAX(current_day_of_month - 1)) * MAX(days_in_current_month)) / SUM(Target_Conversions)` | Projected % of order target achieved |
