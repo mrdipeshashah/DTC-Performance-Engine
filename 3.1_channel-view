@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.rpt_channel_performance` AS
 WITH daily_channel_actuals AS (
   SELECT
     p.date,
@@ -9,8 +8,8 @@ WITH daily_channel_actuals AS (
     COALESCE(SUM(g.sessions), 0) AS sessions,
     COALESCE(SUM(g.ga_transactions), 0) AS ga_transactions,
     COALESCE(SUM(g.ga_revenue), 0) AS ga_revenue
-  FROM `mrdipeshashah.Forecasting.stg_paidmedia` p
-  LEFT JOIN `mrdipeshashah.Forecasting.stg_googleanalytics` g 
+  FROM `entertablename.Forecasting.stg_dailypaidmedia` p
+  LEFT JOIN `entertablename.Forecasting.stg_dailygoogleanalytics` g 
     ON p.date = g.date AND LOWER(p.channel) = LOWER(g.channel)
   GROUP BY 1, 2
 )
