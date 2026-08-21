@@ -11,7 +11,7 @@ ga_mtd AS (
     SUM(Sessions) AS mtd_ga_sessions,
     SUM(GA_Transactions) AS mtd_ga_transactions,
     SUM(GA_Revenue) AS mtd_ga_revenue
-  FROM `mrdipeshashah.Forecasting.googleanalytics`
+  FROM `entertablename.Forecasting.dailygoogleanalytics`
   WHERE Date >= (SELECT start_of_month FROM current_month_range)
     AND Date < (SELECT today FROM current_month_range)
   GROUP BY 1
@@ -24,7 +24,7 @@ paid_mtd AS (
     SUM(Cost) AS mtd_ad_spend,
     SUM(Impressions) AS mtd_impressions,
     SUM(Clicks) AS mtd_clicks
-  FROM `mrdipeshashah.Forecasting.paidmedia`
+  FROM `entertablename.Forecasting.dailypaidmedia`
   WHERE Date >= (SELECT start_of_month FROM current_month_range)
     AND Date < (SELECT today FROM current_month_range)
   GROUP BY 1
@@ -39,7 +39,7 @@ shopify_mtd AS (
     SUM(Total_Customers) AS mtd_total_customers,
     SUM(New_Customers) AS mtd_new_customers,
     SUM(Profit) AS mtd_shopify_profit
-  FROM `mrdipeshashah.Forecasting.shopify`
+  FROM `entertablename.Forecasting.dailyshopify`
   WHERE Date >= (SELECT start_of_month FROM current_month_range)
     AND Date < (SELECT today FROM current_month_range)
   GROUP BY 1
