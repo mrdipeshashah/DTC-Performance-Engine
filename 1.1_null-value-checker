@@ -4,7 +4,7 @@ SELECT
   COUNTIF(Shopify_Revenue IS NULL) AS null_revenue_or_cost,
   COUNTIF(Profit IS NULL) AS null_profit_or_conversions,
   COUNTIF(Shopify_Orders IS NULL) AS null_orders_or_sessions
-FROM `enter.tablename.Forecasting.shopify`
+FROM `entertablename.Forecasting.dailyshopify`
 
 UNION ALL
 
@@ -14,7 +14,7 @@ SELECT
   COUNTIF(Cost IS NULL),
   COUNTIF(Clicks IS NULL),
   COUNTIF(Impressions IS NULL)
-FROM `enter.tablename.Forecasting.paidmedia`
+FROM `entertablename.Forecasting.dailypaidmedia`
 
 UNION ALL
 
@@ -24,7 +24,7 @@ SELECT
   COUNTIF(GA_Revenue IS NULL),
   COUNTIF(GA_Transactions IS NULL),
   COUNTIF(Sessions IS NULL)
-FROM `enter.tablename.Forecasting.googleanalytics`
+FROM `entertablename.Forecasting.dailygoogleanalytics`
 
 UNION ALL
 
@@ -34,7 +34,7 @@ SELECT
   COUNTIF(Spend_Target IS NULL),
   COUNTIF(Revenue_Target IS NULL),
   COUNTIF(Conversions_Target IS NULL)
-FROM `enter.tablename.Forecasting.channelstarget`
+FROM `entertablename.Forecasting.channelstarget`
 
 UNION ALL
 
@@ -44,4 +44,4 @@ SELECT
   COUNTIF(Spend_Target IS NULL),
   COUNTIF(Profit_Target IS NULL),
   COUNTIF(Conversions_Target IS NULL)
-FROM `enter.tablename.Forecasting.alltargets`;
+FROM `entertablename.Forecasting.alltargets`;
