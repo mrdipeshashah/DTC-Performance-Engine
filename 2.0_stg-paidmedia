@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_paidmedia` AS
+CREATE OR REPLACE VIEW `entertablename.Forecasting.stg_dailypaidmedia` AS
 SELECT
   CAST(Date AS DATE) AS date,
   TRIM(Channel) AS channel,
