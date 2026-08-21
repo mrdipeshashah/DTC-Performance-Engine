@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_alltargets` AS
 SELECT
   CAST(Month AS DATE) AS Month,
   CAST(Spend_Target AS NUMERIC) AS Spend_Target,
@@ -7,4 +6,4 @@ SELECT
   CAST(Total_Customers_Target AS INT64) AS Total_Customers_Target,
   CAST(New_Customers_Target AS INT64) AS New_Customers_Target,
   CAST(Profit_Target AS NUMERIC) AS Profit_Target
-FROM `mrdipeshashah.Forecasting.alltargets`;
+FROM `entertablename.Forecasting.alltargets`;
