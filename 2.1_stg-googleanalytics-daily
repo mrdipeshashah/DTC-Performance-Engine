@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_googleanalytics` AS
+CREATE OR REPLACE VIEW `entertablename.Forecasting.stg_dailygoogleanalytics` AS
 SELECT
   CAST(Date AS DATE) AS date,
   TRIM(Channel) AS channel,
