@@ -6,7 +6,7 @@ WITH daily_shopify AS (
     SUM(total_customers) AS daily_total_customers,
     SUM(new_customers) AS daily_new_customers,
     SUM(profit) AS daily_profit
-  FROM `mrdipeshashah.Forecasting.stg_shopify`
+  FROM `entertablename.Forecasting.stg_dailyshopify`
   GROUP BY 1
 ),
 
@@ -16,7 +16,7 @@ daily_ga AS (
     SUM(sessions) AS daily_ga_sessions,
     SUM(ga_transactions) AS daily_ga_transactions,
     SUM(ga_revenue) AS daily_ga_revenue
-  FROM `mrdipeshashah.Forecasting.stg_googleanalytics`
+  FROM `entertablename.Forecasting.stg_dailygoogleanalytics`
   GROUP BY 1
 ),
 
@@ -26,7 +26,7 @@ monthly_ga_agg AS (
     SUM(Sessions) AS monthly_ga_sessions,
     SUM(GA_Transactions) AS monthly_ga_transactions,
     SUM(GA_Revenue) AS monthly_ga_revenue
-  FROM `mrdipeshashah.Forecasting.stg_monthlygoogleanalytics`
+  FROM `entertablename.Forecasting.stg_monthlygoogleanalytics`
   GROUP BY 1
 )
 
@@ -80,7 +80,7 @@ SELECT
   ROUND(COALESCE(dg.daily_ga_revenue, 0) - COALESCE(mg.monthly_ga_revenue, 0), 2) AS ga_revenue_variance
 
 FROM daily_shopify ds
-FULL OUTER JOIN `mrdipeshashah.Forecasting.stg_monthlyshopify` ms
+FULL OUTER JOIN `entertablename.Forecasting.stg_monthlyshopify` ms
   ON ds.Month = ms.Month
 FULL OUTER JOIN daily_ga dg
   ON COALESCE(ds.Month, ms.Month) = dg.Month
