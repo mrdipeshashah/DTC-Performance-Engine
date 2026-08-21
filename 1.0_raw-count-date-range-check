@@ -1,9 +1,9 @@
 SELECT 'PaidMedia' AS table_name, COUNT(*) AS total_rows, MIN(Date) AS min_date, MAX(Date) AS max_date FROM `enter.tablename.Forecasting.paidmedia`
 UNION ALL
-SELECT 'GoogleAnalytics', COUNT(*), MIN(Date), MAX(Date) FROM `enter.tablename.Forecasting.googleanalytics`
+SELECT 'GoogleAnalytics', COUNT(*), MIN(Date), MAX(Date) FROM `entertablename.Forecasting.dailygoogleanalytics`
 UNION ALL
-SELECT 'Shopify', COUNT(*), MIN(Date), MAX(Date) FROM `enter.tablename.Forecasting.shopify`
+SELECT 'Shopify', COUNT(*), MIN(Date), MAX(Date) FROM `entertablename.Forecasting.dailyshopify`
 UNION ALL
-SELECT 'ChannelsTargets', COUNT(*), MIN(Month), MAX(Month) FROM `enter.tablename.Forecasting.channelstarget`
+SELECT 'ChannelsTargets', COUNT(*), MIN(Month), MAX(Month) FROM `entertablename.Forecasting.channelstarget`
 UNION ALL
-SELECT 'AllTargets', COUNT(*), MIN(Month), MAX(Month) FROM `enter.tablename.Forecasting.alltargets`;
+SELECT 'AllTargets', COUNT(*), MIN(Month), MAX(Month) FROM `entertablename.Forecasting.alltargets`;
