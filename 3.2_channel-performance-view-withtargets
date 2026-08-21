@@ -1,12 +1,10 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.3.2_channel-performance-view-withtargets` AS
-
 -- 1. Daily MTD Paid Media Spend per Channel
 WITH pm_daily AS (
   SELECT
     DATE_TRUNC(`date`, MONTH) AS Month,
     Channel,
     SUM(cost) AS Actual_Spend
-  FROM `mrdipeshashah.Forecasting.paidmedia`
+  FROM `entertablename.Forecasting.dailypaidmedia`
   WHERE `date` < CURRENT_DATE()
   GROUP BY 1, 2
 ),
@@ -19,7 +17,7 @@ ga_daily AS (
     SUM(GA_Revenue) AS GA_Revenue,
     SUM(GA_Transactions) AS GA_Transactions,
     SUM(Sessions) AS Sessions
-  FROM `mrdipeshashah.Forecasting.googleanalytics`
+  FROM `entertablename.Forecasting.dailygoogleanalytics`
   WHERE `Date` < CURRENT_DATE()
   GROUP BY 1, 2
 ),
@@ -35,7 +33,7 @@ ct_aggregated AS (
     SUM(Revenue_Target) AS Revenue_Target,
     AVG(Target_CPA) AS Target_CPA,
     STRING_AGG(Notes, ' | ') AS Notes
-  FROM `mrdipeshashah.Forecasting.channelstarget`
+  FROM `entertablename.Forecasting.channelstarget`
   GROUP BY 1, 2
 )
 
