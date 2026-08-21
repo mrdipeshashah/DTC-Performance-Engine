@@ -33,17 +33,17 @@ The repository follows a strict modular 3-tier numbering architecture (`1.x` →
 
 | Final Reporting View (`3.x`) | Upstream Dependencies (`2.x` Staging Views) |
 | :--- | :--- |
-| `3.0_master-daily-view` | `2.0_stg-paidmedia-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
-| `3.1_channel-view` | `2.0_stg-paidmedia-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily` |
+| `3.0_master-daily-view` | `2.0_stg-dailypaidmedia`<br>`2.1_stg-dailygoogleanalytics`<br>`2.2_stg-dailyshopify` |
+| `3.1_channel-view` | `2.0_stg-dailypaidmedia`<br>`2.1_stg-dailygoogleanalytics`<br>`2.2_stg-dailyshopify` |
 | `3.2_channel-performance-view-withtargets` | `3.1_channel-view`<br>`2.3_stg-channeltarget` |
-| `3.3_overall-performance-view-withtargets` | `2.2_stg-shopify-daily`<br>`2.1_stg-googleanalytics-daily`<br>`2.0_stg-paidmedia-daily`<br>`2.4_stg-alltargets` |
+| `3.3_overall-performance-view-withtargets` | `2.2_stg-dailyshopify`<br>`2.1_stg-dailygoogleanalytics`<br>`2.0_stg-dailypaidmedia`<br>`2.4_stg-alltargets` |
 
 ### KEY DATA HEALTH & RECONCILIATION VIEWS (AUDIT TOOLS) 
 
 | Utility / Audit View (`1.x` / `2.x`) | Purpose | Upstream Dependencies |
 | :--- | :--- | :--- |
-| `1.4_mtd-keymetrics-tracker` | Dynamic Month-to-Date key metrics tracker up to yesterday | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.0_stg-paidmedia-daily`<br>`2.4_stg-alltargets` |
-| `2.7_stg-daily_v_monthly` | Closed-month data integrity & variance checker (Daily vs. Monthly rollups) | `2.1_stg-googleanalytics-daily`<br>`2.2_stg-shopify-daily`<br>`2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly` |
+| `1.4_mtd-keymetrics-tracker` | Dynamic Month-to-Date key metrics tracker up to yesterday | `2.1_stg-dailygoogleanalytics`<br>`2.2_stg-dailyshopify`<br>`2.0_stg-dailypaidmedia`<br>`2.4_stg-alltargets` |
+| `2.7_stg-daily_v_monthly` | Closed-month data integrity & variance checker (Daily vs. Monthly rollups) | `2.1_stg-dailygoogleanalytics`<br>`2.2_stg-dailyshopify`<br>`2.5_stg-googleanalytics-monthly`<br>`2.6_stg-shopify-monthly` |
 
 ## DASHBOARD LINEAGE & PAGE MAPPING
 
