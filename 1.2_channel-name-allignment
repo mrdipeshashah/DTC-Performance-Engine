@@ -1,6 +1,6 @@
-SELECT DISTINCT 'PaidMedia' AS source, Channel FROM `mrdipeshashah.Forecasting.paidmedia`
+SELECT DISTINCT 'PaidMedia' AS source, Channel FROM `entertablename.Forecasting.dailypaidmedia`
 UNION DISTINCT
-SELECT DISTINCT 'GoogleAnalytics', Channel FROM `mrdipeshashah.Forecasting.googleanalytics`
+SELECT DISTINCT 'GoogleAnalytics', Channel FROM `entertablename.Forecasting.dailygoogleanalytics`
 UNION DISTINCT
-SELECT DISTINCT 'ChannelsTargets', Channel FROM `mrdipeshashah.Forecasting.channelstarget`
+SELECT DISTINCT 'ChannelsTargets', Channel FROM `entertablename.Forecasting.channelstarget`
 ORDER BY Channel, source;
