@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_channelstarget` AS
 SELECT
   CAST(Month AS DATE) AS Month,
   TRIM(Channel) AS Channel,
@@ -8,4 +7,4 @@ SELECT
   CAST(Target_CPA AS NUMERIC) AS Target_CPA,
   CAST(Revenue_Target AS NUMERIC) AS Revenue_Target,
   Notes
-FROM `mrdipeshashah.Forecasting.channelstarget`;
+FROM `entertablename.Forecasting.channelstarget`;
