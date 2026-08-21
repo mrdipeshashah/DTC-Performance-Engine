@@ -33,7 +33,7 @@ ct_aggregated AS (
     SUM(Revenue_Target) AS Revenue_Target,
     AVG(Target_CPA) AS Target_CPA,
     STRING_AGG(Notes, ' | ') AS Notes
-  FROM `entertablename.Forecasting.channelstarget`
+  FROM `entertablename.Forecasting.stg_channelstarget`
   GROUP BY 1, 2
 )
 
