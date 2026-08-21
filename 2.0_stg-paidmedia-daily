@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `entertablename.Forecasting.stg_dailypaidmedia` AS
 SELECT
   CAST(Date AS DATE) AS date,
   TRIM(Channel) AS channel,
@@ -6,5 +5,5 @@ SELECT
   COALESCE(Cost, 0) AS cost,
   COALESCE(Impressions, 0) AS impressions,
   COALESCE(Clicks, 0) AS clicks
-FROM `mrdipeshashah.Forecasting.paidmedia`
+FROM `entertablename.Forecasting.dailypaidmedia`
 WHERE Date IS NOT NULL;
