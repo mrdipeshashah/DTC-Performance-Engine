@@ -1,10 +1,10 @@
 -- 1. Daily MTD Paid Media Spend per Channel
-WITH pm_daily AS (
+WITH pm_daily AS ( 
   SELECT
     DATE_TRUNC(`date`, MONTH) AS Month,
     Channel,
     SUM(cost) AS Actual_Spend
-  FROM `entertablename.Forecasting.dailypaidmedia`
+  FROM `entertablename.Forecasting.stg_dailypaidmedia`
   WHERE `date` < CURRENT_DATE()
   GROUP BY 1, 2
 ),
@@ -17,7 +17,7 @@ ga_daily AS (
     SUM(GA_Revenue) AS GA_Revenue,
     SUM(GA_Transactions) AS GA_Transactions,
     SUM(Sessions) AS Sessions
-  FROM `entertablename.Forecasting.dailygoogleanalytics`
+  FROM `entertablename.Forecasting.stg_dailygoogleanalytics`
   WHERE `Date` < CURRENT_DATE()
   GROUP BY 1, 2
 ),
