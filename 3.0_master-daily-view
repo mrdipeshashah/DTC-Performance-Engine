@@ -1,5 +1,5 @@
 WITH dates AS (
-  SELECT DISTINCT date FROM `mrdipeshashah.Forecasting.stg_shopify`
+  SELECT DISTINCT date FROM `entertablename.Forecasting.stg_dailyshopify`
 ),
 paid_daily AS (
   SELECT 
@@ -7,7 +7,7 @@ paid_daily AS (
     SUM(cost) AS total_cost,
     SUM(clicks) AS total_clicks,
     SUM(impressions) AS total_impressions
-  FROM `mrdipeshashah.Forecasting.stg_paidmedia`
+  FROM `entertablename.Forecasting.stg_dailypaidmedia`
   GROUP BY 1
 ),
 ga_daily AS (
@@ -16,7 +16,7 @@ ga_daily AS (
     SUM(sessions) AS total_sessions,
     SUM(ga_transactions) AS total_ga_transactions,
     SUM(ga_revenue) AS total_ga_revenue
-  FROM `mrdipeshashah.Forecasting.stg_googleanalytics`
+  FROM `entertablename.Forecasting.stg_dailygoogleanalytics`
   GROUP BY 1
 )
 SELECT
@@ -54,7 +54,7 @@ SELECT
   SAFE_DIVIDE(p.total_cost, s.new_customers) AS blended_cac
 
 FROM dates d
-LEFT JOIN `mrdipeshashah.Forecasting.stg_shopify` s ON d.date = s.date
+LEFT JOIN `entertablename.Forecasting.stg_dailyshopify` s ON d.date = s.date
 LEFT JOIN paid_daily p ON d.date = p.date
 LEFT JOIN ga_daily g ON d.date = g.date
-LEFT JOIN `mrdipeshashah.Forecasting.stg_alltargets` t ON DATE_TRUNC(d.date, MONTH) = t.month;
+LEFT JOIN `entertablename.Forecasting.stg_alltargets` t ON DATE_TRUNC(d.date, MONTH) = t.month;
