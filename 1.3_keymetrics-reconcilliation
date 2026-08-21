@@ -4,7 +4,7 @@ SELECT
   ROUND(SUM(Profit), 2) AS total_profit,
   0.00 AS total_spend,
   SUM(Shopify_Orders) AS total_orders_or_conversions
-FROM `mrdipeshashah.Forecasting.shopify`
+FROM `entertablename.Forecasting.dailyshopify`
 
 UNION ALL
 
@@ -14,7 +14,7 @@ SELECT
   0.00,
   ROUND(SUM(Cost), 2),
   0
-FROM `mrdipeshashah.Forecasting.paidmedia`
+FROM `entertablename.Forecasting.dailypaidmedia`
 
 UNION ALL
 
@@ -24,7 +24,7 @@ SELECT
   0.00,
   0.00,
   SUM(GA_Transactions)
-FROM `mrdipeshashah.Forecasting.googleanalytics`
+FROM `entertablename.Forecasting.dailygoogleanalytics`
 
 UNION ALL
 
@@ -34,7 +34,7 @@ SELECT
   0.00,
   ROUND(SUM(Spend_Target), 2),
   SUM(Conversions_Target)
-FROM `mrdipeshashah.Forecasting.channelstarget`
+FROM `entertablename.Forecasting.channelstarget`
 
 UNION ALL
 
@@ -44,4 +44,4 @@ SELECT
   ROUND(SUM(Profit_Target), 2),
   ROUND(SUM(Spend_Target), 2),
   SUM(Conversions_Target)
-FROM `mrdipeshashah.Forecasting.alltargets`;
+FROM `entertablename.Forecasting.alltargets`;
