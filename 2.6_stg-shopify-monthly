@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_monthlyshopify` AS
 SELECT
   -- Formats Date to strict DATE type
   CAST(Date AS DATE) AS Month,
@@ -10,4 +9,4 @@ SELECT
   CAST(New_Customers AS INT64) AS New_Customers,
   CAST(Profit AS NUMERIC) AS Profit
 
-FROM `mrdipeshashah.Forecasting.monthlyshopify`;
+FROM `entertablename.Forecasting.monthlyshopify`;
