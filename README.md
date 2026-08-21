@@ -12,8 +12,21 @@ The Google Sheet template shared is for setting channels targets and combined ta
 
 ## ARCHITECTURE OVERVIEW
 
-The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Data Studio.
+The reporting pipeline transforms raw data feeds into production-ready BigQuery models used directly by Looker Studio.
 
+### DATA PIPELINE ARCHITECTURE & LAYERING STRATEGY
+
+The repository follows a strict modular 3-tier numbering architecture (`1.x` → `2.x` → `3.x`) to separate raw data validation, transformations, and final reporting presentation:
+
+* **Layer 1.x — Data Quality & Reconciliation (Audit Tools):**  
+  Queries prefixed with `1.0` through `1.4` query the raw external tables directly (`PaidMedia`, `GoogleAnalytics`, `Shopify`, `Targets`). They handle schema validation, identify missing date ranges, check for `NULL` values, align channel naming conventions, and run daily reconciliation routines before data is transformed further.
+
+* **Layer 2.x — Staging Layer (`stg_` Views):**  
+  Queries prefixed with `2.0` through `2.7` clean, standardize, and format the raw source data into modular staging views. This layer executes explicit data type casting, date standardizations (`YYYY-MM-DD`), monthly aggregation logic, and preliminary target pairings—ensuring clean downstream joins without touching raw source tables directly.
+
+* **Layer 3.x — Final Reporting Layer (Production Models):**  
+  Queries prefixed with `3.0` through `3.3` assemble the normalized staging components (`2.x`) into wide, aggregated production models. These views execute master daily joins, apply safe division run-rate pacing, and calculate core storewide/channel metrics consumed directly by Looker Studio.
+  
 ## REPORTING VIEWS & LINEAGE MATRIX
 
 ### FINAL REPORTING VIEWS 
