@@ -1,4 +1,4 @@
-SELECT 'PaidMedia' AS table_name, COUNT(*) AS total_rows, MIN(Date) AS min_date, MAX(Date) AS max_date FROM `enter.tablename.Forecasting.paidmedia`
+SELECT 'PaidMedia' AS table_name, COUNT(*) AS total_rows, MIN(Date) AS min_date, MAX(Date) AS max_date FROM `entertablename.Forecasting.dailypaidmedia`
 UNION ALL
 SELECT 'GoogleAnalytics', COUNT(*), MIN(Date), MAX(Date) FROM `entertablename.Forecasting.dailygoogleanalytics`
 UNION ALL
