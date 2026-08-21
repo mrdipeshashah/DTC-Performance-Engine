@@ -1,4 +1,3 @@
-CREATE OR REPLACE VIEW `mrdipeshashah.Forecasting.stg_shopify` AS
 SELECT
   CAST(Date AS DATE) AS date,
   COALESCE(Shopify_Orders, 0) AS shopify_orders,
@@ -6,5 +5,5 @@ SELECT
   COALESCE(Total_Customers, 0) AS total_customers,
   COALESCE(New_Customers, 0) AS new_customers,
   COALESCE(Profit, 0) AS profit
-FROM `mrdipeshashah.Forecasting.shopify`
+FROM `entertablename.Forecasting.dailyshopify`
 WHERE Date IS NOT NULL;
