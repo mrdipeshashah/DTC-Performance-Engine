@@ -1,9 +1,8 @@
-CREATE OR REPLACE VIEW `entertablename.Forecasting.stg_dailygoogleanalytics` AS
 SELECT
   CAST(Date AS DATE) AS date,
   TRIM(Channel) AS channel,
   COALESCE(Sessions, 0) AS sessions,
   COALESCE(GA_Transactions, 0) AS ga_transactions,
   COALESCE(GA_Revenue, 0) AS ga_revenue
-FROM `mrdipeshashah.Forecasting.googleanalytics`
+FROM `entertablename.Forecasting.dailygoogleanalytics`
 WHERE Date IS NOT NULL;
