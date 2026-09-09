@@ -1,10 +1,10 @@
 -- 1. Daily MTD Paid Media Spend per Channel
-WITH pm_daily AS ( 
+WITH pm_daily AS (
   SELECT
     DATE_TRUNC(`date`, MONTH) AS Month,
     Channel,
     SUM(cost) AS Actual_Spend
-  FROM `entertablename.Forecasting.stg_dailypaidmedia`
+  FROM `mrdipeshashah.Forecasting.paidmedia`
   WHERE `date` < CURRENT_DATE()
   GROUP BY 1, 2
 ),
@@ -17,7 +17,7 @@ ga_daily AS (
     SUM(GA_Revenue) AS GA_Revenue,
     SUM(GA_Transactions) AS GA_Transactions,
     SUM(Sessions) AS Sessions
-  FROM `entertablename.Forecasting.stg_dailygoogleanalytics`
+  FROM `mrdipeshashah.Forecasting.googleanalytics`
   WHERE `Date` < CURRENT_DATE()
   GROUP BY 1, 2
 ),
@@ -33,7 +33,7 @@ ct_aggregated AS (
     SUM(Revenue_Target) AS Revenue_Target,
     AVG(Target_CPA) AS Target_CPA,
     STRING_AGG(Notes, ' | ') AS Notes
-  FROM `entertablename.Forecasting.stg_channelstarget`
+  FROM `mrdipeshashah.Forecasting.channelstarget`
   GROUP BY 1, 2
 )
 
@@ -63,12 +63,29 @@ SELECT
   SAFE_DIVIDE(ga.GA_Transactions, ct.Conversions_Target) AS Conversion_Delivery_Pct,
   (COALESCE(ga.GA_Revenue, 0) - COALESCE(ct.Revenue_Target, 0)) AS Revenue_Variance,
 
-  -- Projected Channel Run-Rates (Safe for Day 1)
-  SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Channel_Revenue,
+  -- Projected Channel Run-Rates (Historical Cap Protection)
+  CASE 
+    WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+      THEN COALESCE(ga.GA_Revenue, 0)
+    ELSE SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+      * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
+  END AS Projected_Channel_Revenue,
 
-  SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Channel_Spend
+  CASE 
+    WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+      THEN COALESCE(pm.Actual_Spend, 0)
+    ELSE SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+      * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
+  END AS Projected_Channel_Spend,
+
+  -- Projected Delivery % Calculations for Channels
+  SAFE_DIVIDE(
+    CASE 
+      WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(ga.GA_Revenue, 0)
+      ELSE SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
+    END,
+    NULLIF(ct.Revenue_Target, 0)
+  ) AS Projected_Channel_Revenue_Delivery_Pct
 
 FROM ga_daily ga
 
