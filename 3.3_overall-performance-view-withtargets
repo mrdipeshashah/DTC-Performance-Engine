@@ -6,7 +6,7 @@ WITH shopify_daily AS (
     SUM(Total_Customers) AS Total_Customers,
     SUM(New_Customers) AS New_Customers,
     SUM(Profit) AS Profit
-  FROM `entertablename.Forecasting.stg_dailyshopify`
+  FROM `mrdipeshashah.Forecasting.shopify`
   WHERE `Date` < CURRENT_DATE()
   GROUP BY 1
 ),
@@ -16,7 +16,7 @@ paidmedia_daily AS (
   SELECT
     DATE_TRUNC(`date`, MONTH) AS Month,
     SUM(cost) AS Actual_Spend
-  FROM `entertablename.Forecasting.stg_dailypaidmedia`
+  FROM `mrdipeshashah.Forecasting.paidmedia`
   WHERE `date` < CURRENT_DATE()
   GROUP BY 1
 ),
@@ -28,7 +28,7 @@ ga_daily AS (
     SUM(Sessions) AS Total_GA_Sessions,
     SUM(GA_Transactions) AS Total_GA_Transactions,
     SUM(GA_Revenue) AS Total_GA_Revenue
-  FROM `entertablename.Forecasting.stg_dailygoogleanalytics`
+  FROM `mrdipeshashah.Forecasting.googleanalytics`
   WHERE `Date` < CURRENT_DATE()
   GROUP BY 1
 )
@@ -63,37 +63,65 @@ SELECT
   COALESCE(t.New_Customers_Target, 0) AS Target_New_Customers,
   COALESCE(t.Profit_Target, 0) AS Target_Profit,
 
-  -- Projected Run-Rate Calculations (Safe for Day 1)
-  SAFE_DIVIDE(COALESCE(s.Shopify_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Total_Revenue,
+  -- Dynamic Projected Run-Rate Calculations (Historical Cap Protection)
+  CASE 
+    WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+      THEN COALESCE(s.Shopify_Revenue, 0)
+    ELSE SAFE_DIVIDE(COALESCE(s.Shopify_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+      * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
+  END AS Projected_Total_Revenue,
 
-  SAFE_DIVIDE(COALESCE(s.Profit, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Total_Profit,
+  CASE 
+    WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+      THEN COALESCE(s.Profit, 0)
+    ELSE SAFE_DIVIDE(COALESCE(s.Profit, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+      * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
+  END AS Projected_Total_Profit,
 
-  SAFE_DIVIDE(COALESCE(s.Shopify_Orders, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Total_Orders,
+  CASE 
+    WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+      THEN COALESCE(s.Shopify_Orders, 0)
+    ELSE SAFE_DIVIDE(COALESCE(s.Shopify_Orders, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+      * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
+  END AS Projected_Total_Orders,
 
-  SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
-    * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) AS Projected_Spend,
+  CASE 
+    WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+      THEN COALESCE(pm.Actual_Spend, 0)
+    ELSE SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
+      * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
+  END AS Projected_Spend,
 
   -- Projected Delivery / Pacing % Calculations
   SAFE_DIVIDE(
-    SAFE_DIVIDE(COALESCE(s.Shopify_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    CASE 
+      WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(s.Shopify_Revenue, 0)
+      ELSE SAFE_DIVIDE(COALESCE(s.Shopify_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
+    END,
     NULLIF(t.Revenue_Target, 0)
   ) AS Projected_Revenue_Delivery_Pct,
 
   SAFE_DIVIDE(
-    SAFE_DIVIDE(COALESCE(s.Profit, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    CASE 
+      WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(s.Profit, 0)
+      ELSE SAFE_DIVIDE(COALESCE(s.Profit, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
+    END,
     NULLIF(t.Profit_Target, 0)
   ) AS Projected_Profit_Delivery_Pct,
 
   SAFE_DIVIDE(
-    SAFE_DIVIDE(COALESCE(s.Shopify_Orders, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    CASE 
+      WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(s.Shopify_Orders, 0)
+      ELSE SAFE_DIVIDE(COALESCE(s.Shopify_Orders, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
+    END,
     NULLIF(t.Conversions_Target, 0)
   ) AS Projected_Orders_Delivery_Pct,
 
   SAFE_DIVIDE(
-    SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())),
+    CASE 
+      WHEN COALESCE(s.Month, ga.Month, pm.Month, t.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(pm.Actual_Spend, 0)
+      ELSE SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
+    END,
     NULLIF(t.Spend_Target, 0)
   ) AS Spend_Pacing_Pct,
 
@@ -133,5 +161,5 @@ FULL OUTER JOIN ga_daily ga
   ON s.Month = ga.Month
 FULL OUTER JOIN paidmedia_daily pm
   ON COALESCE(s.Month, ga.Month) = pm.Month
-FULL OUTER JOIN `entertablename.Forecasting.stg_alltargets` t
+FULL OUTER JOIN `mrdipeshashah.Forecasting.stg_alltargets` t
   ON COALESCE(s.Month, ga.Month, pm.Month) = t.Month;
