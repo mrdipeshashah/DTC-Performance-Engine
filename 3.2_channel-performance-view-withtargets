@@ -49,7 +49,7 @@ ct_monthly_totals AS (
 -- 5. Master store targets for scaling alignment
 master_targets AS (
   SELECT
-    Month,
+    CAST(Month AS DATE) AS Month,
     Revenue_Target AS Master_Revenue_Target
   FROM `mrdipeshashah.Forecasting.stg_alltargets`
 )
@@ -66,7 +66,7 @@ SELECT
   COALESCE(ga.GA_Revenue, 0) AS Actual_Revenue,
   COALESCE(pm.Actual_Spend, 0) AS Actual_Spend,
 
-  -- Adjusted Targets (Scales Channel Targets to Match Master Revenue Target)
+  -- Adjusted Targets
   COALESCE(ct.Spend_Target, 0) AS Target_Spend,
   COALESCE(ct.Conversions_Target, 0) AS Target_Conversions,
   COALESCE(
@@ -96,25 +96,26 @@ SELECT
     )
   ) AS Revenue_Variance,
 
-  -- Projected Channel Run-Rates (Historical Cap Protection)
+  -- Projected Channel Run-Rates (STRICT DATE BOUNDARY SAFE)
   CASE 
-    WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+    WHEN CAST(COALESCE(ga.Month, pm.Month, ct.Month) AS DATE) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
       THEN COALESCE(ga.GA_Revenue, 0)
     ELSE SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
       * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
   END AS Projected_Channel_Revenue,
 
   CASE 
-    WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+    WHEN CAST(COALESCE(ga.Month, pm.Month, ct.Month) AS DATE) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
       THEN COALESCE(pm.Actual_Spend, 0)
     ELSE SAFE_DIVIDE(COALESCE(pm.Actual_Spend, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) 
       * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE())) 
   END AS Projected_Channel_Spend,
 
-  -- Projected Delivery % Calculations for Channels
+  -- Projected Delivery % Calculations
   SAFE_DIVIDE(
     CASE 
-      WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(ga.GA_Revenue, 0)
+      WHEN CAST(COALESCE(ga.Month, pm.Month, ct.Month) AS DATE) < DATE_TRUNC(CURRENT_DATE(), MONTH) 
+        THEN COALESCE(ga.GA_Revenue, 0)
       ELSE SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
     END,
     NULLIF(
