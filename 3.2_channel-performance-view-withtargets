@@ -30,11 +30,28 @@ ct_aggregated AS (
     ANY_VALUE(Campaign) AS Campaign,
     SUM(Spend_Target) AS Spend_Target,
     SUM(Conversions_Target) AS Conversions_Target,
-    SUM(Revenue_Target) AS Revenue_Target,
+    SUM(Revenue_Target) AS Unadjusted_Revenue_Target,
     AVG(Target_CPA) AS Target_CPA,
     STRING_AGG(Notes, ' | ') AS Notes
   FROM `mrdipeshashah.Forecasting.channelstarget`
   GROUP BY 1, 2
+),
+
+-- 4. Calculate total unadjusted channel targets per month for scaling
+ct_monthly_totals AS (
+  SELECT
+    Month,
+    SUM(Unadjusted_Revenue_Target) AS Total_Unadjusted_Revenue_Target
+  FROM ct_aggregated
+  GROUP BY 1
+),
+
+-- 5. Master store targets for scaling alignment
+master_targets AS (
+  SELECT
+    Month,
+    Revenue_Target AS Master_Revenue_Target
+  FROM `mrdipeshashah.Forecasting.stg_alltargets`
 )
 
 SELECT
@@ -49,19 +66,35 @@ SELECT
   COALESCE(ga.GA_Revenue, 0) AS Actual_Revenue,
   COALESCE(pm.Actual_Spend, 0) AS Actual_Spend,
 
-  -- Targets
+  -- Adjusted Targets (Scales Channel Targets to Match Master Revenue Target)
   COALESCE(ct.Spend_Target, 0) AS Target_Spend,
   COALESCE(ct.Conversions_Target, 0) AS Target_Conversions,
-  COALESCE(ct.Revenue_Target, 0) AS Target_Revenue,
+  COALESCE(
+    SAFE_DIVIDE(ct.Unadjusted_Revenue_Target, ctm.Total_Unadjusted_Revenue_Target) * mt.Master_Revenue_Target,
+    ct.Unadjusted_Revenue_Target,
+    0
+  ) AS Target_Revenue,
   ct.Target_CPA,
   ct.Notes,
 
   -- Performance Calculations
   SAFE_DIVIDE(ga.GA_Transactions, ga.Sessions) AS Actual_CVR,
   SAFE_DIVIDE(ga.GA_Revenue, ga.GA_Transactions) AS Actual_AOV,
-  SAFE_DIVIDE(ga.GA_Revenue, ct.Revenue_Target) AS Revenue_Delivery_Pct,
+  SAFE_DIVIDE(
+    ga.GA_Revenue,
+    COALESCE(
+      SAFE_DIVIDE(ct.Unadjusted_Revenue_Target, ctm.Total_Unadjusted_Revenue_Target) * mt.Master_Revenue_Target,
+      ct.Unadjusted_Revenue_Target
+    )
+  ) AS Revenue_Delivery_Pct,
   SAFE_DIVIDE(ga.GA_Transactions, ct.Conversions_Target) AS Conversion_Delivery_Pct,
-  (COALESCE(ga.GA_Revenue, 0) - COALESCE(ct.Revenue_Target, 0)) AS Revenue_Variance,
+  (
+    COALESCE(ga.GA_Revenue, 0) - COALESCE(
+      SAFE_DIVIDE(ct.Unadjusted_Revenue_Target, ctm.Total_Unadjusted_Revenue_Target) * mt.Master_Revenue_Target,
+      ct.Unadjusted_Revenue_Target,
+      0
+    )
+  ) AS Revenue_Variance,
 
   -- Projected Channel Run-Rates (Historical Cap Protection)
   CASE 
@@ -84,7 +117,13 @@ SELECT
       WHEN COALESCE(ga.Month, pm.Month, ct.Month) < DATE_TRUNC(CURRENT_DATE(), MONTH) THEN COALESCE(ga.GA_Revenue, 0)
       ELSE SAFE_DIVIDE(COALESCE(ga.GA_Revenue, 0), GREATEST(EXTRACT(DAY FROM CURRENT_DATE() - 1), 1)) * EXTRACT(DAY FROM LAST_DAY(CURRENT_DATE()))
     END,
-    NULLIF(ct.Revenue_Target, 0)
+    NULLIF(
+      COALESCE(
+        SAFE_DIVIDE(ct.Unadjusted_Revenue_Target, ctm.Total_Unadjusted_Revenue_Target) * mt.Master_Revenue_Target,
+        ct.Unadjusted_Revenue_Target
+      ),
+      0
+    )
   ) AS Projected_Channel_Revenue_Delivery_Pct
 
 FROM ga_daily ga
@@ -95,4 +134,10 @@ FULL OUTER JOIN pm_daily pm
 
 FULL OUTER JOIN ct_aggregated ct
   ON COALESCE(ga.Month, pm.Month) = ct.Month
- AND LOWER(TRIM(COALESCE(ga.Channel, pm.Channel))) = LOWER(TRIM(ct.Channel));
+ AND LOWER(TRIM(COALESCE(ga.Channel, pm.Channel))) = LOWER(TRIM(ct.Channel))
+
+LEFT JOIN ct_monthly_totals ctm
+  ON COALESCE(ga.Month, pm.Month, ct.Month) = ctm.Month
+
+LEFT JOIN master_targets mt
+  ON COALESCE(ga.Month, pm.Month, ct.Month) = mt.Month;
