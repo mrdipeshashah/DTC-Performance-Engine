@@ -50,7 +50,7 @@ The repository follows a strict modular 3-tier numbering architecture (`1.x` →
 | Dashboard Page | Primary Data Source (BQ View) 
 | :--- | :--- |
 | **01. Executive Overview** | `3.0_master-daily-view` | 
-| **02. E-Commerce & Site Efficiency** | `3.0_master-daily-view` + `3.3_overall-performance-view-withtargets` | 
+| **02. E-Commerce & Site Efficiency** | `3.0_master-daily-view` | 
 | **03. MCD Pacing & MoM Trends** |  `3.3_overall-performance-view-withtargets` 
 | **04. Channel Deep Dive** | `3.2_channel-performance-view-withtargets` + `3.3_overall-performance-view-withtargets` | 
 | **05. Appendix** | `3.2_channel-performance-view-withtargets` + `3.3_overall-performance-view-withtargets` | 
