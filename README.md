@@ -52,7 +52,7 @@ The repository follows a strict modular 3-tier numbering architecture (`1.x` →
 | **01. Executive Overview** | `3.0_master-daily-view` | 
 | **02. E-Commerce & Site Efficiency** | `3.0_master-daily-view` + `3.3_overall-performance-view-withtargets` | 
 | **03. MCD Pacing & MoM Trends** |  `3.3_overall-performance-view-withtargets` 
-| **04. Channel Campaign & Deep Dive** | `3.2_channel-performance-view-withtargets` + `3.3_overall-performance-view-withtargets` | 
+| **04. Channel Deep Dive** | `3.2_channel-performance-view-withtargets` + `3.3_overall-performance-view-withtargets` | 
 | **05. Appendix** | `3.2_channel-performance-view-withtargets` + `3.3_overall-performance-view-withtargets` | 
 
 ## DATA REQUIREMENTS & SCHEMA
