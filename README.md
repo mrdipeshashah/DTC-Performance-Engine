@@ -6,7 +6,11 @@ This repository contains Big Query code to build an automated end-to-end solutio
 
 Google Sheet Template - https://docs.google.com/spreadsheets/d/1h9bdhZ442xld7QvSfQDYv1YYpQl0XNnF8Tj9kE4sR7s/edit?usp=sharing
 
-Data Studio Dashboard - https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
+Data Studio Dashboard 
+
+The Master - https://datastudio.google.com/reporting/d2b7b27e-3607-4e35-b957-68562d146bc2
+
+The Exec View - https://datastudio.google.com/reporting/14cb9682-ad13-4b21-8d84-af1df015342f
 
 The Google Sheet template shared is for setting channels targets and combined targets 
 
