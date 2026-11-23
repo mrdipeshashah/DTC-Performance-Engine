@@ -133,7 +133,7 @@ Maps all raw BigQuery schema fields and defines standardised calculation logic f
 
 ### BigQuery Views
 
-| Source Sheet Tab | Header | BigQuery Field Name | Data Type | Notes / Clean Transformations |
+| Source | Header | BigQuery Field Name | Data Type | Notes / Clean Transformations |
 | :--- | :--- | :--- | :--- | :--- |
 | **`PaidMedia`** | Date | `Date` | `DATE` | `YYYY-MM-DD` |
 | | Channel | `Channel` | `STRING` | Channel name |
